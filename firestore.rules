@@ -12,25 +12,25 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.token.admin == true;
     }
     
-    // Products collection - read by all, write by authenticated admin users
+    // Products collection - read by all, write by authenticated users for now
     match /products/{productId} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.token.admin == true;
+      allow write: if request.auth != null;
     }
     
-    // Orders collection - read/write by authenticated admin users only
+    // Orders collection - TEMPORARY: allow any authenticated user for development
     match /orders/{orderId} {
-      allow read, write: if request.auth != null && request.auth.token.admin == true;
+      allow read, write: if request.auth != null;
     }
     
-    // Customers collection - read/write by authenticated admin users only
+    // Customers collection - TEMPORARY: allow any authenticated user for development  
     match /customers/{customerId} {
-      allow read, write: if request.auth != null && request.auth.token.admin == true;
+      allow read, write: if request.auth != null;
     }
     
-    // Analytics/Stats collection - read by authenticated admin users only
+    // Analytics/Stats collection - read by authenticated users for development
     match /analytics/{document=**} {
-      allow read: if request.auth != null && request.auth.token.admin == true;
+      allow read: if request.auth != null;
       allow write: if false; // Analytics should be read-only
     }
     

@@ -1,12 +1,26 @@
+export interface ProductDimensions {
+  length: number
+  width: number
+  height: number
+  unit: 'cm' | 'in'
+}
+
 export interface Product {
   id: string
   name: string
   description: string
+  sku: string
   price: number
   category: string
   imageUrl?: string
+  images?: string[]
   stock: number
   featured: boolean
+  status: 'active' | 'inactive' | 'out_of_stock'
+  weight?: number
+  dimensions?: ProductDimensions
+  alcoholContent?: number
+  bottleSize?: number
   createdAt: Date
   updatedAt: Date
 }
