@@ -18,6 +18,7 @@ import {
   BulkDeleteOrdersDialog, 
   UpdateStatusDialog 
 } from "@/components/orders/OrderActionDialogs"
+import { OrderViewDialog } from "@/components/orders/OrderViewDialog"
 import { QuickOrderData } from "@/lib/validation-orders"
 import { Order } from "@/lib/types"
 import { 
@@ -68,6 +69,8 @@ export default function OrdersPage() {
   const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false)
   const [showUpdateStatusDialog, setShowUpdateStatusDialog] = useState(false)
   const [updateStatusType, setUpdateStatusType] = useState<'single' | 'bulk'>('single')
+  const [showViewDialog, setShowViewDialog] = useState(false)
+  const [viewingOrder, setViewingOrder] = useState<Order | null>(null)
 
   // Search state
   const [searchTerm, setSearchTerm] = useState('')
@@ -94,6 +97,12 @@ export default function OrdersPage() {
   const handleBulkUpdateStatus = () => {
     setUpdateStatusType('bulk')
     setShowUpdateStatusDialog(true)
+  }
+
+  // Handle view order
+  const handleViewOrder = (order: Order) => {
+    setViewingOrder(order)
+    setShowViewDialog(true)
   }
 
   // Handle form submit
@@ -442,7 +451,7 @@ export default function OrdersPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewOrder(order)}>
                                 <Eye className="h-4 w-4 mr-2" />
                                 Visualizza
                               </DropdownMenuItem>
@@ -564,6 +573,13 @@ export default function OrdersPage() {
           order={deletingOrder}
           type={updateStatusType}
           orderCount={selectedOrders.length}
+        />
+
+        {/* View Order Dialog */}
+        <OrderViewDialog
+          open={showViewDialog}
+          onOpenChange={setShowViewDialog}
+          order={viewingOrder}
         />
       </div>
     </AdminLayout>
