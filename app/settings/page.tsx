@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AdminLayout } from "@/components/admin"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,6 +11,8 @@ import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
+import { useSettings } from "@/hooks/use-settings"
+import { StoreSettings, NotificationSettings } from "@/lib/settings"
 import { 
   Settings as SettingsIcon, 
   Store, 
@@ -23,111 +25,100 @@ import {
   Upload,
   Mail,
   Lock,
-  Globe
+  RefreshCw,
+  AlertCircle,
+  CheckCircle
 } from "lucide-react"
-
-interface StoreSettings {
-  name: string
-  description: string
-  email: string
-  phone: string
-  address: string
-  city: string
-  country: string
-  currency: string
-  timezone: string
-}
-
-interface NotificationSettings {
-  emailOrderReceived: boolean
-  emailLowStock: boolean
-  emailNewCustomer: boolean
-  emailWeeklyReport: boolean
-  pushNotifications: boolean
-}
 
 export default function SettingsPage() {
   const { toast } = useToast()
   
-  // Store settings state
-  const [storeSettings, setStoreSettings] = useState<StoreSettings>({
-    name: 'BibiGin Premium Store',
-    description: 'Negozio premium di gin artigianali e bevande spiritose di alta qualità',
-    email: 'info@bibigin.com',
-    phone: '+39 02 1234 5678',
-    address: 'Via Roma 123',
-    city: 'Milano',
-    country: 'Italia',
-    currency: 'EUR',
-    timezone: 'Europe/Rome'
-  })
+  // Use settings hook for real Firebase persistence
+  const {
+    storeSettings: loadedStoreSettings,
+    notificationSettings: loadedNotificationSettings,
+    loading,
+    saving,
+    error,
+    validationErrors,
+    lastUpdated,
+    saveStoreSettings,
+    saveNotificationSettings,
+    clearError,
+    clearValidationErrors
+  } = useSettings()
 
-  // Notification settings state
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({
-    emailOrderReceived: true,
-    emailLowStock: true,
-    emailNewCustomer: false,
-    emailWeeklyReport: true,
-    pushNotifications: true
-  })
-
-  // Loading states
-  const [isSavingStore, setIsSavingStore] = useState(false)
-  const [isSavingNotifications, setIsSavingNotifications] = useState(false)
+  // Local form state
+  const [storeSettings, setStoreSettings] = useState<StoreSettings | null>(null)
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings | null>(null)
   const [isExporting, setIsExporting] = useState(false)
+
+  // Sync loaded settings with local form state
+  useEffect(() => {
+    if (loadedStoreSettings && !storeSettings) {
+      setStoreSettings(loadedStoreSettings)
+    }
+    if (loadedNotificationSettings && !notificationSettings) {
+      setNotificationSettings(loadedNotificationSettings)
+    }
+  }, [loadedStoreSettings, loadedNotificationSettings, storeSettings, notificationSettings])
+
+  // Show error toast when error occurs
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Errore",
+        description: error,
+        variant: "destructive"
+      })
+      clearError()
+    }
+  }, [error, toast, clearError])
 
   // Handle store settings change
   const handleStoreSettingChange = (field: keyof StoreSettings, value: string) => {
-    setStoreSettings(prev => ({ ...prev, [field]: value }))
+    if (storeSettings) {
+      setStoreSettings(prev => prev ? { ...prev, [field]: value } : null)
+      // Clear validation errors when user types
+      clearValidationErrors()
+    }
   }
 
   // Handle notification settings change
   const handleNotificationChange = (field: keyof NotificationSettings, value: boolean) => {
-    setNotificationSettings(prev => ({ ...prev, [field]: value }))
+    if (notificationSettings) {
+      setNotificationSettings(prev => prev ? { ...prev, [field]: value } : null)
+    }
   }
 
-  // Save store settings
+  // Save store settings with real Firebase persistence
   const handleSaveStoreSettings = async () => {
-    try {
-      setIsSavingStore(true)
-      // In a real app, this would save to Firebase
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Mock delay
-      
+    if (!storeSettings) return
+    
+    const success = await saveStoreSettings(storeSettings)
+    
+    if (success) {
       toast({
         title: "Impostazioni salvate",
         description: "Le impostazioni del negozio sono state aggiornate con successo."
       })
-    } catch (error) {
-      toast({
-        title: "Errore",
-        description: "Si è verificato un errore durante il salvataggio.",
-        variant: "destructive"
-      })
-    } finally {
-      setIsSavingStore(false)
     }
+    // Error handling is done by the hook and useEffect above
   }
 
-  // Save notification settings
+  // Save notification settings with real Firebase persistence
   const handleSaveNotificationSettings = async () => {
-    try {
-      setIsSavingNotifications(true)
-      // In a real app, this would save to Firebase
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Mock delay
-      
+    if (!notificationSettings) return
+    
+    const success = await saveNotificationSettings(notificationSettings)
+    
+    if (success) {
       toast({
         title: "Notifiche aggiornate",
         description: "Le impostazioni delle notifiche sono state salvate."
       })
-    } catch (error) {
-      toast({
-        title: "Errore",
-        description: "Si è verificato un errore durante il salvataggio.",
-        variant: "destructive"
-      })
-    } finally {
-      setIsSavingNotifications(false)
     }
+    // Error handling is done by the hook and useEffect above
   }
 
   // Export data
@@ -156,13 +147,45 @@ export default function SettingsPage() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="font-playfair text-3xl font-bold text-foreground">
-            Impostazioni
-          </h1>
-          <p className="text-muted-foreground">
-            Gestisci le configurazioni del tuo negozio BibiGin
-          </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="font-playfair text-3xl font-bold text-foreground">
+              Impostazioni
+            </h1>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-muted-foreground">
+                Gestisci le configurazioni del tuo negozio BibiGin
+              </p>
+              {loading && (
+                <RefreshCw className="w-4 h-4 animate-spin text-muted-foreground" />
+              )}
+            </div>
+            {lastUpdated && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Ultimo aggiornamento: {lastUpdated.toLocaleString('it-IT')}
+              </p>
+            )}
+          </div>
+          
+          {/* Status indicator */}
+          <div className="flex items-center gap-2">
+            {loading ? (
+              <Badge variant="secondary" className="gap-1">
+                <RefreshCw className="w-3 h-3 animate-spin" />
+                Caricamento...
+              </Badge>
+            ) : error ? (
+              <Badge variant="destructive" className="gap-1">
+                <AlertCircle className="w-3 h-3" />
+                Errore
+              </Badge>
+            ) : (
+              <Badge variant="default" className="bg-green-100 text-green-800 gap-1">
+                <CheckCircle className="w-3 h-3" />
+                Sincronizzato
+              </Badge>
+            )}
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
@@ -182,10 +205,14 @@ export default function SettingsPage() {
                     <Label htmlFor="storeName">Nome Negozio</Label>
                     <Input
                       id="storeName"
-                      value={storeSettings.name}
+                      value={storeSettings?.name || ''}
                       onChange={(e) => handleStoreSettingChange('name', e.target.value)}
                       placeholder="Nome del tuo negozio"
+                      disabled={loading}
                     />
+                    {validationErrors.store?.name && (
+                      <p className="text-sm text-destructive">{validationErrors.store.name[0]}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
@@ -193,10 +220,14 @@ export default function SettingsPage() {
                     <Input
                       id="storeEmail"
                       type="email"
-                      value={storeSettings.email}
+                      value={storeSettings?.email || ''}
                       onChange={(e) => handleStoreSettingChange('email', e.target.value)}
                       placeholder="email@esempio.com"
+                      disabled={loading}
                     />
+                    {validationErrors.store?.email && (
+                      <p className="text-sm text-destructive">{validationErrors.store.email[0]}</p>
+                    )}
                   </div>
                 </div>
 
@@ -204,11 +235,15 @@ export default function SettingsPage() {
                   <Label htmlFor="storeDescription">Descrizione</Label>
                   <Textarea
                     id="storeDescription"
-                    value={storeSettings.description}
+                    value={storeSettings?.description || ''}
                     onChange={(e) => handleStoreSettingChange('description', e.target.value)}
                     placeholder="Descrizione del tuo negozio"
                     rows={3}
+                    disabled={loading}
                   />
+                  {validationErrors.store?.description && (
+                    <p className="text-sm text-destructive">{validationErrors.store.description[0]}</p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -216,20 +251,28 @@ export default function SettingsPage() {
                     <Label htmlFor="storePhone">Telefono</Label>
                     <Input
                       id="storePhone"
-                      value={storeSettings.phone}
+                      value={storeSettings?.phone || ''}
                       onChange={(e) => handleStoreSettingChange('phone', e.target.value)}
                       placeholder="+39 123 456 7890"
+                      disabled={loading}
                     />
+                    {validationErrors.store?.phone && (
+                      <p className="text-sm text-destructive">{validationErrors.store.phone[0]}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="storeCity">Città</Label>
                     <Input
                       id="storeCity"
-                      value={storeSettings.city}
+                      value={storeSettings?.city || ''}
                       onChange={(e) => handleStoreSettingChange('city', e.target.value)}
                       placeholder="Milano"
+                      disabled={loading}
                     />
+                    {validationErrors.store?.city && (
+                      <p className="text-sm text-destructive">{validationErrors.store.city[0]}</p>
+                    )}
                   </div>
                 </div>
 
@@ -237,10 +280,14 @@ export default function SettingsPage() {
                   <Label htmlFor="storeAddress">Indirizzo</Label>
                   <Input
                     id="storeAddress"
-                    value={storeSettings.address}
+                    value={storeSettings?.address || ''}
                     onChange={(e) => handleStoreSettingChange('address', e.target.value)}
                     placeholder="Via Roma 123"
+                    disabled={loading}
                   />
+                  {validationErrors.store?.address && (
+                    <p className="text-sm text-destructive">{validationErrors.store.address[0]}</p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
@@ -248,41 +295,56 @@ export default function SettingsPage() {
                     <Label htmlFor="storeCountry">Paese</Label>
                     <Input
                       id="storeCountry"
-                      value={storeSettings.country}
+                      value={storeSettings?.country || ''}
                       onChange={(e) => handleStoreSettingChange('country', e.target.value)}
                       placeholder="Italia"
+                      disabled={loading}
                     />
+                    {validationErrors.store?.country && (
+                      <p className="text-sm text-destructive">{validationErrors.store.country[0]}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="storeCurrency">Valuta</Label>
                     <Input
                       id="storeCurrency"
-                      value={storeSettings.currency}
+                      value={storeSettings?.currency || ''}
                       onChange={(e) => handleStoreSettingChange('currency', e.target.value)}
                       placeholder="EUR"
+                      disabled={loading}
                     />
+                    {validationErrors.store?.currency && (
+                      <p className="text-sm text-destructive">{validationErrors.store.currency[0]}</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="storeTimezone">Fuso Orario</Label>
                     <Input
                       id="storeTimezone"
-                      value={storeSettings.timezone}
+                      value={storeSettings?.timezone || ''}
                       onChange={(e) => handleStoreSettingChange('timezone', e.target.value)}
                       placeholder="Europe/Rome"
+                      disabled={loading}
                     />
+                    {validationErrors.store?.timezone && (
+                      <p className="text-sm text-destructive">{validationErrors.store.timezone[0]}</p>
+                    )}
                   </div>
                 </div>
 
                 <div className="flex justify-end">
                   <Button 
                     onClick={handleSaveStoreSettings}
-                    disabled={isSavingStore}
+                    disabled={saving || loading || !storeSettings}
                     className="bg-navy hover:bg-navy/90 text-cream"
                   >
-                    {isSavingStore ? (
-                      <>Salvataggio...</>
+                    {saving ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Salvataggio...
+                      </>
                     ) : (
                       <>
                         <Save className="w-4 h-4 mr-2" />
@@ -312,8 +374,9 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <Switch
-                      checked={notificationSettings.emailOrderReceived}
+                      checked={notificationSettings?.emailOrderReceived || false}
                       onCheckedChange={(checked) => handleNotificationChange('emailOrderReceived', checked)}
+                      disabled={loading}
                     />
                   </div>
                   
@@ -327,8 +390,9 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <Switch
-                      checked={notificationSettings.emailLowStock}
+                      checked={notificationSettings?.emailLowStock || false}
                       onCheckedChange={(checked) => handleNotificationChange('emailLowStock', checked)}
+                      disabled={loading}
                     />
                   </div>
                   
@@ -342,8 +406,9 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <Switch
-                      checked={notificationSettings.emailNewCustomer}
+                      checked={notificationSettings?.emailNewCustomer || false}
                       onCheckedChange={(checked) => handleNotificationChange('emailNewCustomer', checked)}
+                      disabled={loading}
                     />
                   </div>
                   
@@ -357,8 +422,9 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <Switch
-                      checked={notificationSettings.emailWeeklyReport}
+                      checked={notificationSettings?.emailWeeklyReport || false}
                       onCheckedChange={(checked) => handleNotificationChange('emailWeeklyReport', checked)}
+                      disabled={loading}
                     />
                   </div>
                   
@@ -372,8 +438,9 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <Switch
-                      checked={notificationSettings.pushNotifications}
+                      checked={notificationSettings?.pushNotifications || false}
                       onCheckedChange={(checked) => handleNotificationChange('pushNotifications', checked)}
+                      disabled={loading}
                     />
                   </div>
                 </div>
@@ -381,11 +448,14 @@ export default function SettingsPage() {
                 <div className="flex justify-end">
                   <Button 
                     onClick={handleSaveNotificationSettings}
-                    disabled={isSavingNotifications}
+                    disabled={saving || loading || !notificationSettings}
                     className="bg-navy hover:bg-navy/90 text-cream"
                   >
-                    {isSavingNotifications ? (
-                      <>Salvataggio...</>
+                    {saving ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Salvataggio...
+                      </>
                     ) : (
                       <>
                         <Save className="w-4 h-4 mr-2" />
