@@ -218,10 +218,16 @@ function generateCustomerEmailTemplate(data: OrderConfirmationData): string {
                   <td>${formatCurrency(item.total)}</td>
                 </tr>
               `).join('')}
+              <tr>
+                <td colspan="3" style="text-align: right; padding-top: 10px;"><strong>Subtotale:</strong></td>
+                <td style="padding-top: 10px;">${formatCurrency(data.order.subtotal || data.order.total)}</td>
+              </tr>
+              <tr>
+                <td colspan="3" style="text-align: right;"><strong>Spedizione:</strong></td>
+                <td>${formatCurrency(data.order.shippingCost || 0)}</td>
+              </tr>
               <tr class="total-row">
-                <td><strong>TOTALE</strong></td>
-                <td></td>
-                <td></td>
+                <td colspan="3" style="text-align: right;"><strong>TOTALE:</strong></td>
                 <td><strong>${formatCurrency(data.order.total)}</strong></td>
               </tr>
             </tbody>
@@ -287,10 +293,12 @@ DETTAGLI ORDINE:
 - Email: ${data.customer.email}
 
 PRODOTTI ORDINATI:
-${data.order.items.map(item => 
+${data.order.items.map(item =>
   `- ${item.productName} x${item.quantity} = ${formatCurrency(item.total)}`
 ).join('\n')}
 
+Subtotale: ${formatCurrency(data.order.subtotal || data.order.total)}
+Spedizione: ${formatCurrency(data.order.shippingCost || 0)}
 TOTALE: ${formatCurrency(data.order.total)}
 
 DATI BONIFICO:
@@ -395,10 +403,16 @@ function generateAdminEmailTemplate(data: AdminNotificationData): string {
                   <td>${formatCurrency(item.total)}</td>
                 </tr>
               `).join('')}
+              <tr>
+                <td colspan="3" style="text-align: right; padding-top: 10px;"><strong>Subtotale:</strong></td>
+                <td style="padding-top: 10px;">${formatCurrency(data.order.subtotal || data.order.total)}</td>
+              </tr>
+              <tr>
+                <td colspan="3" style="text-align: right;"><strong>Spedizione:</strong></td>
+                <td>${formatCurrency(data.order.shippingCost || 0)}</td>
+              </tr>
               <tr class="total-row">
-                <td><strong>TOTALE ORDINE</strong></td>
-                <td></td>
-                <td></td>
+                <td colspan="3" style="text-align: right;"><strong>TOTALE ORDINE:</strong></td>
                 <td><strong>${formatCurrency(data.order.total)}</strong></td>
               </tr>
             </tbody>
@@ -445,10 +459,12 @@ Email: ${data.customer.email}
 ${data.customer.phone ? `Telefono: ${data.customer.phone}` : ''}
 
 PRODOTTI:
-${data.order.items.map(item => 
+${data.order.items.map(item =>
   `- ${item.productName} x${item.quantity} = ${formatCurrency(item.total)}`
 ).join('\n')}
 
+Subtotale: ${formatCurrency(data.order.subtotal || data.order.total)}
+Spedizione: ${formatCurrency(data.order.shippingCost || 0)}
 TOTALE: ${formatCurrency(data.order.total)}
 
 PAGAMENTO: Bonifico Bancario
@@ -458,10 +474,10 @@ Gestionale: ${data.dashboardUrl}
   `
 }
 
-// Default bank details (these should be moved to environment variables in production)
+// Default bank details
 export const defaultBankDetails = {
-  iban: 'IT60 X054 2811 1010 0000 0123 456',
+  iban: 'IT48 Q030 6943 4401 0000 0004 392',
   bankName: 'Banca Intesa Sanpaolo',
-  beneficiary: 'BibiGin S.r.l.',
-  reference: (orderId: string) => `Ordine ${formatOrderNumber(orderId)}`
+  beneficiary: 'BibiGin',
+  reference: (orderId: string, customerName: string) => `Acquisto GIN - ${customerName}`
 }

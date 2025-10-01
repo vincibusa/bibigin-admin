@@ -23,6 +23,9 @@ export const orderSchema = z.object({
   customerId: z.string().min(1, "ID cliente obbligatorio"),
   customerEmail: z.string().email("Email non valida"),
   items: z.array(orderItemSchema).min(1, "Almeno un prodotto richiesto"),
+  subtotal: z.number().min(0, "Subtotale non può essere negativo").optional(),
+  shippingCost: z.number().min(0, "Costo spedizione non può essere negativo").optional(),
+  shipping_cost: z.number().min(0, "Costo spedizione non può essere negativo").optional(), // For backwards compatibility
   total: z.number().min(0, "Totale non può essere negativo"),
   status: z.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled'], {
     message: "Stato ordine non valido"

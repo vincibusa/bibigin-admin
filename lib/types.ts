@@ -30,6 +30,8 @@ export interface Order {
   customerId: string
   customerEmail: string
   items: OrderItem[]
+  subtotal: number
+  shippingCost: number
   total: number
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded'

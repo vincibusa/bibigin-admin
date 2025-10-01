@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { 
-  sendOrderConfirmationEmail, 
+import {
+  sendOrderConfirmationEmail,
   sendAdminNotificationEmail,
-  defaultBankDetails, 
-  OrderConfirmationData, 
-  AdminNotificationData 
+  defaultBankDetails,
+  OrderConfirmationData,
+  AdminNotificationData
 } from '@/lib/email'
-import { getOrder } from '@/lib/orders'
+import { getAdminDb } from '@/lib/firebase-admin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,21 +15,38 @@ export async function POST(request: NextRequest) {
 
     if (!orderId || !customer?.firstName || !customer?.lastName || !customer?.email) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Missing required fields: orderId, customer.firstName, customer.lastName, customer.email' 
+        {
+          success: false,
+          error: 'Missing required fields: orderId, customer.firstName, customer.lastName, customer.email'
         },
         { status: 400 }
       )
     }
 
-    // Get order details from database
-    const order = await getOrder(orderId)
-    if (!order) {
+    // Get order details from database using Admin SDK
+    const db = getAdminDb()
+    const orderDoc = await db.collection('orders').doc(orderId).get()
+
+    if (!orderDoc.exists) {
       return NextResponse.json(
         { success: false, error: 'Order not found' },
         { status: 404 }
       )
+    }
+
+    const orderData = orderDoc.data()
+    const order = {
+      id: orderDoc.id,
+      ...orderData,
+      createdAt: orderData?.createdAt?.toDate() || new Date(),
+      updatedAt: orderData?.updatedAt?.toDate() || new Date(),
+      // Ensure shipping field exists
+      shipping: orderData?.shipping || {
+        street: orderData?.shippingAddress?.street,
+        city: orderData?.shippingAddress?.city,
+        postalCode: orderData?.shippingAddress?.postalCode,
+        country: orderData?.shippingAddress?.country
+      }
     }
 
     // Prepare customer confirmation email data
@@ -44,7 +61,7 @@ export async function POST(request: NextRequest) {
         iban: defaultBankDetails.iban,
         bankName: defaultBankDetails.bankName,
         beneficiary: defaultBankDetails.beneficiary,
-        reference: defaultBankDetails.reference(orderId)
+        reference: defaultBankDetails.reference(orderId, `${customer.firstName} ${customer.lastName}`)
       }
     }
 
