@@ -58,6 +58,7 @@ export interface User {
   city: string
   province: string
   postalCode: string
+  country: string
   role: 1 | 2 // 1 = admin, 2 = normal user
   isActive: boolean
   acceptedTerms: boolean
@@ -65,19 +66,9 @@ export interface User {
   updatedAt: Date
   lastLoginAt?: Date
   authProvider: 'email' | 'google'
-}
-
-export interface Customer {
-  id: string
-  email: string
-  firstName: string
-  lastName: string
-  phone?: string
-  defaultAddress?: Address
+  // E-commerce fields
   orders: string[] // Order IDs
   totalSpent: number
-  createdAt: Date
-  lastOrderAt?: Date
 }
 
 export interface Address {
