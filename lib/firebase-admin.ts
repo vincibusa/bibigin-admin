@@ -1,4 +1,4 @@
-import { initializeApp, cert, getApps, App } from 'firebase-admin/app'
+import { initializeApp, cert, getApps, App, ServiceAccount } from 'firebase-admin/app'
 import { getAuth, Auth } from 'firebase-admin/auth'
 import { getFirestore, Firestore } from 'firebase-admin/firestore'
 import { getStorage, Storage } from 'firebase-admin/storage'
@@ -24,13 +24,18 @@ export function initializeFirebaseAdmin() {
   try {
     // Initialize with service account credentials
     // You can either use environment variables or a service account JSON file
-    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
-      ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-      : {
-          projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n')
-        }
+// Validate required environment variables
+    if (!process.env.FIREBASE_ADMIN_PROJECT_ID || !process.env.FIREBASE_ADMIN_CLIENT_EMAIL || !process.env.FIREBASE_ADMIN_PRIVATE_KEY) {
+      console.warn('⚠️ Firebase Admin SDK: Some environment variables are missing, skipping initialization during build')
+      return { app: null, adminAuth: null, adminDb: null, adminStorage: null }
+    }
+
+    const serviceAccount = {
+      type: "service_account",
+      project_id: process.env.FIREBASE_ADMIN_PROJECT_ID,
+      client_email: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+      private_key: process.env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n')
+    } as ServiceAccount
 
     app = initializeApp({
       credential: cert(serviceAccount),
@@ -64,7 +69,10 @@ export { adminAuth, adminDb, adminStorage }
 export function getAdminAuth(): Auth {
   if (!adminAuth) {
     const initialized = initializeFirebaseAdmin()
-    return initialized.adminAuth!
+    if (!initialized.adminAuth) {
+      throw new Error('Firebase Admin SDK not properly initialized - missing environment variables')
+    }
+    return initialized.adminAuth
   }
   return adminAuth
 }
@@ -72,7 +80,10 @@ export function getAdminAuth(): Auth {
 export function getAdminDb(): Firestore {
   if (!adminDb) {
     const initialized = initializeFirebaseAdmin()
-    return initialized.adminDb!
+    if (!initialized.adminDb) {
+      throw new Error('Firebase Admin SDK not properly initialized - missing environment variables')
+    }
+    return initialized.adminDb
   }
   return adminDb
 }
@@ -80,7 +91,10 @@ export function getAdminDb(): Firestore {
 export function getAdminStorage(): Storage {
   if (!adminStorage) {
     const initialized = initializeFirebaseAdmin()
-    return initialized.adminStorage!
+    if (!initialized.adminStorage) {
+      throw new Error('Firebase Admin SDK not properly initialized - missing environment variables')
+    }
+    return initialized.adminStorage
   }
   return adminStorage
 }

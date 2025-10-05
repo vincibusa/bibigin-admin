@@ -2,9 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/lib/firebase-admin'
 import { withAdminAuth } from '@/lib/auth-middleware'
 
+// Interface for users from Firestore with optional fields
+interface FirestoreUser {
+  id: string
+  email?: string
+  firstName?: string
+  lastName?: string
+  createdAt: string
+  updatedAt: string
+  [key: string]: unknown // For other dynamic fields
+}
+
 // GET /api/users - Get all users (admin only)
 export async function GET(request: NextRequest) {
-  return withAdminAuth(request, async (req, user) => {
+  return withAdminAuth(request, async (req) => {
     try {
       const db = getAdminDb()
       const searchParams = req.nextUrl.searchParams
@@ -18,15 +29,15 @@ export async function GET(request: NextRequest) {
 
       // Apply Firestore filters
       if (role !== null) {
-        query = query.where('role', '==', Number(role)) as any
+        query = query.where('role', '==', Number(role))
       }
 
       if (isActive !== null) {
-        query = query.where('isActive', '==', isActive === 'true') as any
+        query = query.where('isActive', '==', isActive === 'true')
       }
 
       const snapshot = await query.get()
-      let users = snapshot.docs.map(doc => ({
+      let users: FirestoreUser[] = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),

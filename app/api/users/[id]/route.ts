@@ -76,6 +76,7 @@ export async function PATCH(
       }
 
       // Filter out sensitive fields that shouldn't be updated via API
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { role, isActive, totalSpent, orders, ...updateData } = body
 
       // Filter out undefined values
@@ -115,7 +116,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withAdminAuth(request, async (req, user) => {
+  return withAdminAuth(request, async () => {
     try {
       const { id } = await params
       const db = getAdminDb()
@@ -136,8 +137,8 @@ export async function DELETE(
       // Delete from Firebase Auth
       try {
         await adminAuth.deleteUser(id)
-      } catch (authError) {
-        console.warn('User not found in Auth, continuing with Firestore deletion')
+      } catch (authError: unknown) {
+        console.warn('User not found in Auth, continuing with Firestore deletion', authError)
       }
 
       // Delete from Firestore

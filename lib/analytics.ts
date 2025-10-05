@@ -1,7 +1,7 @@
 import { getOrders } from './orders'
 import { getCustomers } from './customers'
 import { getProducts } from './products'
-import { Order, Customer, Product } from './types'
+import { Order } from './types'
 
 // Analytics interfaces
 export interface AnalyticsDateRange {
@@ -219,7 +219,7 @@ export async function getTopProducts(
 ): Promise<TopProduct[]> {
   try {
     const orders = await getOrders()
-    const products = await getProducts()
+    await getProducts() // Keep for potential future use
     
     // Filter orders by date range
     const ordersInRange = orders.filter(order => 

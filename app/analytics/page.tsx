@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { AdminLayout } from "@/components/admin"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -42,7 +42,7 @@ export default function AnalyticsPage() {
   const dateRanges = getDateRanges()
 
   // Get current date range based on selection
-  const getCurrentDateRange = (): AnalyticsDateRange => {
+  const getCurrentDateRange = useCallback((): AnalyticsDateRange => {
     if (selectedRange === 'custom' && customDateRange) {
       return customDateRange
     }
@@ -54,10 +54,10 @@ export default function AnalyticsPage() {
       lastMonth: dateRanges.lastMonth
     }
     return validRanges[selectedRange as keyof typeof validRanges] || dateRanges.last30Days
-  }
+  }, [selectedRange, customDateRange, dateRanges])
 
   // Load analytics data
-  const loadAnalytics = async () => {
+  const loadAnalytics = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -69,7 +69,7 @@ export default function AnalyticsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [getCurrentDateRange])
 
   // Refresh data
   const handleRefresh = async () => {
@@ -97,7 +97,7 @@ export default function AnalyticsPage() {
   // Load data on mount and when date range changes
   useEffect(() => {
     loadAnalytics()
-  }, [selectedRange, customDateRange])
+  }, [loadAnalytics])
 
   // Get range label for display
   const getRangeLabel = () => {

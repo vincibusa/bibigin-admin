@@ -11,6 +11,8 @@ export function middleware(request: NextRequest) {
     const allowedOrigins = [
       'http://localhost:3001',
       'http://localhost:3000',
+      'https://bibiginlacorte.it',
+      'https://www.bibiginlacorte.it',
       'https://bibiginlacorte.com',
       'https://www.bibiginlacorte.com',
     ]

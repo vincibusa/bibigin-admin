@@ -152,6 +152,7 @@ export function OrderViewDialog({ open, onOpenChange, order }: OrderViewDialogPr
                       src={item.image}
                       alt={item.name || item.productName}
                       className="w-12 h-12 object-cover rounded"
+                      loading="lazy"
                       onError={(e) => {
                         e.currentTarget.src = '/placeholder.png'
                       }}

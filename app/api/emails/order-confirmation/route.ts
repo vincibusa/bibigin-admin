@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         iban: defaultBankDetails.iban,
         bankName: defaultBankDetails.bankName,
         beneficiary: defaultBankDetails.beneficiary,
-        reference: defaultBankDetails.reference(orderId)
+        reference: defaultBankDetails.reference(orderId, `${customer.firstName} ${customer.lastName}`)
       }
     }
 

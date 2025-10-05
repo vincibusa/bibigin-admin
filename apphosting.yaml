@@ -1,23 +1,144 @@
-# Settings for Backend (on Cloud Run).
-# See https://firebase.google.com/docs/app-hosting/configure#cloud-run
+# Firebase App Hosting Configuration - BibiGin Admin
+# https://firebase.google.com/docs/app-hosting/configure
+
+# Regione di deployment per Europa
+location: europe-west4
+
+# Configurazione build per Next.js
+build:
+  # Usa il builder ufficiale per Next.js
+  builder: nextjs
+  # Configurazioni specifiche per Next.js builder
+  nextjs:
+    # Versione di Node.js da utilizzare
+    nodeVersion: 20
+
+# Settings for Backend (on Cloud Run)
 runConfig:
-  minInstances: 0
-  # maxInstances: 100
-  # concurrency: 80
-  # cpu: 1
-  # memoryMiB: 512
+  minInstances: 1
+  maxInstances: 5
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
 
-# Environment variables and secrets.
-# env:
-  # Configure environment variables.
-  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
-  # - variable: MESSAGE
-  #   value: Hello world!
-  #   availability:
-  #     - BUILD
-  #     - RUNTIME
+# Variabili d'ambiente per BibiGin Admin
+env:
+  # ========================================
+  # FIREBASE CLIENT CONFIGURATION (Public)
+  # ========================================
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: AIzaSyCl4MqY6JJl7deD10EPMZNoBra-W3ZJnpI
+    availability:
+      - BUILD
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: bibiginlacorte.firebaseapp.com
+    availability:
+      - BUILD
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: bibiginlacorte
+    availability:
+      - BUILD
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: bibiginlacorte.firebasestorage.app
+    availability:
+      - BUILD
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "855780980251"
+    availability:
+      - BUILD
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: 1:855780980251:web:93f9f41f1878285af66abe
+    availability:
+      - BUILD
+  # Frontend API URL (public)
+  - variable: NEXT_PUBLIC_API_URL
+    value: https://gestionale--bibiginlacorte.europe-west4.hosted.app
+    availability:
+      - BUILD
 
-  # Grant access to secrets in Cloud Secret Manager.
-  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
-  # - variable: MY_SECRET
-  #   secret: mySecretRef
+  # ========================================
+  # FIREBASE ADMIN SDK CONFIGURATION (Private)
+  # ========================================
+  - variable: FIREBASE_ADMIN_PROJECT_ID
+    value: bibiginlacorte
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_ADMIN_CLIENT_EMAIL
+    value: firebase-adminsdk-fbsvc@bibiginlacorte.iam.gserviceaccount.com
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: FIREBASE_ADMIN_PRIVATE_KEY
+    value: |
+      -----BEGIN PRIVATE KEY-----
+      MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC+5ZGDGrPj6/1E
+      aaFKae0SUdbH1Z2rKVZM7tQC4f3c4sJRMCGhA2FuTI7zm8cq64DfSVASRzEgO6NK
+      u69aEeZ2czbvkafqJoG9QiHQGKuxe+aGQlx3UATGKGohoPHcSqiz2pDJSgIgHsz2
+      hBXaVCCFi+r1uHHMXP0h2X3omBv9AX4XSJjQjAS8No0mBwDhZ1HHiOVqqUc8jRaB
+      lvgu0qhK2rJO6r1LrU8GbGgjxAvwEZECu6arSQsT7tb8Jlzuk7+NTMOcxMD7wDZD
+      MSK2l49HGaNJVlG5X147HqjrNMeWBjotukHIwcKjtnI48eln0aBfhMvoThCFkN1q
+      CLKkdkMdAgMBAAECggEACz/QAV/Tdfz0IdHvtUjktY2pEIGgFvQKp+HzEHBs21Vp
+      igtCEBD47t0IF4b4h6j1ITNaypjzZijdiIvi23XulNBZTmjQ8lVuk86P24l4pK7e
+      eM70T/uhLGQ5TN4FIqwroN2iZpo74dSu02AZQZJvkC8cm3pRCm/4YsRETS6Zh6Ey
+      rJvK8Jp32FGqfsaBmKlGSwU2F1KR8+GGbO6LGFj28oifrmx5CeNzMVTaTmeKuvLX
+      mXq0vDl/1DQMcpmyDn/jnI9N3Sq0/t4xkmGodgIGGR1KkLz+BxKXqMizMz4c9u2u
+      6W2YcyDTY8n0xMTtPMpdgCS8t64X5BcQG7Hr1md06QKBgQD2yqf4UndqvKqoOhm/
+      Gv+yzltajypcj+4dUwrqZDN2aaO4FTIGsK9wuF+PMFKtE4+A2a46oSKNbCRPghr1
+      1Em+59h+sGxFjEgCSO098Y1wTjvUu1pHJJ2rsuLBgtleldW/O8O98XZAt1GwJSJ+
+      GTrkh+MRooNiFkZwjjYSacOzJwKBgQDGBQGzbJ62tu2uAbwuE6M3R/WnuR2F42iZ
+      CRjYcBHq/Gu6QWaNnb5LOo8PFx2CNd5MU9p//TE5zB/dE441o8WNzsGqC7pPlOi6
+      omt6M9bO0nXj5aUnnEWxP21a4hr3LvHqf6aUwzEXSxg54EJcNlqoldwAxjO1UQAr
+      tvcdW31yGwKBgBFg7fkfnYcnqADWro91kEIAJBC5eiswe30XJvKggbs57yx8WZx8
+      /q26XghQR9ImSXmyWoGIbU12KwxqRgm/nD3UR7uMIuO24C9BAWvWQbaB29a8JrxR
+      yMSZgTxNQY9Wj8m6pKsQgNpHznnP86Dbl/kV1JieUBAtL2KnsQkU55ILAoGBALQJ
+      5Uv/HCbAF0W4KiIylJk0gfOm6WLMKlPJ458V9hSSwFeuEtH7dALuERgFSj0TQTRg
+      oS7UK2eDYg0dNJUse/e83nP/CbxFhXv7JIENFOcijzFPoGNtQCgxpPmWzjGjqyws
+      N4bWGZI2IqascWlpue/BoS/LBUR7iw4z4mX8wwe1AoGAAnlJMoidPQhTGyoBAT2D
+      l5zrsGhfZ7/sb3TSbU92vH81Vklz2f5pGGW4fkAj0l8M33nIJB5l1X8GwFqWmwkL
+      6JAKBwNHq5Gd0YrJXe5/F1llponyPWUBGV5MIeMbEIykk9RB9llWhUSshBE2do/x
+      Y7ozda75010Akroso/ZYEBY=
+      -----END PRIVATE KEY-----
+    availability:
+      - BUILD
+      - RUNTIME
+
+  # ========================================
+  # EMAIL CONFIGURATION (Private)
+  # ========================================
+  - variable: EMAIL_HOST
+    value: smtp.gmail.com
+    availability:
+      - RUNTIME
+  - variable: EMAIL_PORT
+    value: "587"
+    availability:
+      - RUNTIME
+  - variable: EMAIL_USER
+    value: bibiginlacorte@gmail.com
+    availability:
+      - RUNTIME
+  - variable: EMAIL_PASS
+    value: cntz uhgd nvbf rxud
+    availability:
+      - RUNTIME
+  - variable: FROM_EMAIL
+    value: noreply@bibiginlacorte.com
+    availability:
+      - RUNTIME
+  - variable: FROM_NAME
+    value: BibiGin - Gin delle Fasi Lunari
+    availability:
+      - RUNTIME
+  - variable: ADMIN_EMAIL
+    value: admin@bibiginlacorte.com
+    availability:
+      - RUNTIME
+
+  # ========================================
+  # ADMIN DASHBOARD CONFIGURATION
+  # ========================================
+  - variable: ADMIN_URL
+    value: https://gestionale--bibiginlacorte.europe-west4.hosted.app
+    availability:
+      - RUNTIME

@@ -37,10 +37,19 @@ export async function POST(request: NextRequest) {
     const orderData = orderDoc.data()
     const order = {
       id: orderDoc.id,
-      ...orderData,
+      customerId: orderData?.customerId || '',
+      customerEmail: orderData?.customerEmail || '',
+      items: orderData?.items || [],
+      subtotal: orderData?.subtotal || 0,
+      shippingCost: orderData?.shippingCost || 0,
+      total: orderData?.total || 0,
+      status: orderData?.status || 'pending',
+      paymentStatus: orderData?.paymentStatus || 'pending',
+      shippingAddress: orderData?.shippingAddress || {},
+      billingAddress: orderData?.billingAddress || {},
       createdAt: orderData?.createdAt?.toDate() || new Date(),
       updatedAt: orderData?.updatedAt?.toDate() || new Date(),
-      // Ensure shipping field exists
+      // Ensure shipping field exists for backward compatibility
       shipping: orderData?.shipping || {
         street: orderData?.shippingAddress?.street,
         city: orderData?.shippingAddress?.city,

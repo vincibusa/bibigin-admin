@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/lib/firebase-admin'
-import { withAuth, withAdminAuth } from '@/lib/auth-middleware'
+import { withAdminAuth } from '@/lib/auth-middleware'
 import { ProductFormData, ProductFilter } from '@/lib/validation-products'
+
+// Interface for products from Firestore with optional fields
+interface FirestoreProduct {
+  id: string
+  name?: string
+  description?: string
+  sku?: string
+  price?: number
+  createdAt: string
+  updatedAt: string
+  [key: string]: unknown // For other dynamic fields
+}
 
 // GET /api/products - Get all products with optional filters
 // Public endpoint - no auth required for viewing products
@@ -12,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     // Parse filters from query params
     const filters: ProductFilter = {
-      status: searchParams.get('status') as any || undefined,
+      status: (searchParams.get('status') as ProductFilter['status']) || undefined,
         category: searchParams.get('category') || undefined,
         featured: searchParams.get('featured') === 'true' ? true : searchParams.get('featured') === 'false' ? false : undefined,
         inStock: searchParams.get('inStock') === 'true' ? true : searchParams.get('inStock') === 'false' ? false : undefined,
@@ -25,27 +37,27 @@ export async function GET(request: NextRequest) {
 
       // Apply Firestore filters
       if (filters.status && filters.status !== 'all') {
-        query = query.where('status', '==', filters.status) as any
+        query = query.where('status', '==', filters.status)
       }
 
       if (filters.category) {
-        query = query.where('category', '==', filters.category) as any
+        query = query.where('category', '==', filters.category)
       }
 
       if (filters.featured !== undefined) {
-        query = query.where('featured', '==', filters.featured) as any
+        query = query.where('featured', '==', filters.featured)
       }
 
       if (filters.inStock !== undefined) {
         if (filters.inStock) {
-          query = query.where('stock', '>', 0) as any
+          query = query.where('stock', '>', 0)
         } else {
-          query = query.where('stock', '==', 0) as any
+          query = query.where('stock', '==', 0)
         }
       }
 
       const snapshot = await query.get()
-      let products = snapshot.docs.map(doc => ({
+      let products: FirestoreProduct[] = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
@@ -63,11 +75,11 @@ export async function GET(request: NextRequest) {
       }
 
       if (filters.minPrice !== undefined) {
-        products = products.filter(product => product.price >= filters.minPrice!)
+        products = products.filter(product => (product.price || 0) >= filters.minPrice!)
       }
 
       if (filters.maxPrice !== undefined) {
-        products = products.filter(product => product.price <= filters.maxPrice!)
+        products = products.filter(product => (product.price || 0) <= filters.maxPrice!)
       }
 
     return NextResponse.json({ products })
@@ -82,7 +94,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/products - Create new product (admin only)
 export async function POST(request: NextRequest) {
-  return withAdminAuth(request, async (req, user) => {
+  return withAdminAuth(request, async (req) => {
     try {
       const db = getAdminDb()
       const body = await req.json()

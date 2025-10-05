@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/lib/firebase-admin'
-import { withAuth, withAdminAuth } from '@/lib/auth-middleware'
+import { withAdminAuth } from '@/lib/auth-middleware'
 import { ProductFormData } from '@/lib/validation-products'
 
 // GET /api/products/[id] - Get single product
@@ -45,7 +45,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withAdminAuth(request, async (req, user) => {
+  return withAdminAuth(request, async (req) => {
     try {
       const { id } = await params
       const db = getAdminDb()
@@ -90,7 +90,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withAdminAuth(request, async (req, user) => {
+  return withAdminAuth(request, async () => {
     try {
       const { id } = await params
       const db = getAdminDb()

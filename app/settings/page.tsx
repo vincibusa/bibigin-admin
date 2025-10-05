@@ -132,7 +132,8 @@ export default function SettingsPage() {
         title: "Export completato",
         description: "I dati sono stati esportati con successo."
       })
-    } catch (error) {
+    } catch (error: unknown) {
+      console.error('Export error:', error)
       toast({
         title: "Errore",
         description: "Si è verificato un errore durante l'export.",

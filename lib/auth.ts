@@ -39,10 +39,13 @@ export async function registerWithEmail(formData: RegisterForm): Promise<User> {
       city: formData.city,
       province: formData.province,
       postalCode: formData.postalCode,
+      country: 'Italia', // Default country
       role: 2, // Default: normal user
       isActive: true,
       acceptedTerms: formData.acceptedTerms,
       authProvider: 'email',
+      orders: [],
+      totalSpent: 0,
       createdAt: new Date(),
       updatedAt: new Date()
     }

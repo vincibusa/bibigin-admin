@@ -8,7 +8,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withAuth(request, async (req, user) => {
+  return withAuth(request, async () => {
     try {
       const { id } = await params
       const db = getAdminDb()
@@ -54,7 +54,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withAuth(request, async (req, user) => {
+  return withAuth(request, async (req) => {
     try {
       const { id } = await params
       const db = getAdminDb()
@@ -99,7 +99,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withAdminAuth(request, async (req, user) => {
+  return withAdminAuth(request, async () => {
     try {
       const { id } = await params
       const db = getAdminDb()

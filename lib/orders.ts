@@ -399,6 +399,7 @@ export async function getOrderStats() {
 }
 
 // HELPER FUNCTIONS
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function updateUserOrderHistory(userId: string, orderId: string, orderTotal: number): Promise<void> {
   try {
     const userRef = doc(db, USERS_COLLECTION, userId)
@@ -467,6 +468,7 @@ async function getOrCreateUser(email: string, name: string): Promise<string> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function updateProductStock(productId: string, quantityToReduce: number): Promise<void> {
   try {
     const productRef = doc(db, PRODUCTS_COLLECTION, productId)

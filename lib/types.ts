@@ -32,11 +32,23 @@ export interface Order {
   items: OrderItem[]
   subtotal: number
   shippingCost: number
+  shipping_cost?: number // For backward compatibility
   total: number
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded'
+  paymentMethod?: string
   shippingAddress: Address
   billingAddress: Address
+  notes?: string
+  shipping?: {
+    firstName?: string
+    lastName?: string
+    street?: string
+    city?: string
+    postalCode?: string
+    country?: string
+    phone?: string
+  }
   createdAt: Date
   updatedAt: Date
 }
@@ -44,9 +56,11 @@ export interface Order {
 export interface OrderItem {
   productId: string
   productName: string
+  name?: string
   quantity: number
   price: number
   total: number
+  image?: string
 }
 
 export interface User {
@@ -71,6 +85,30 @@ export interface User {
   // E-commerce fields
   orders: string[] // Order IDs
   totalSpent: number
+}
+
+export interface Customer {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  phone?: string
+  dateOfBirth?: Date
+  address?: string
+  city?: string
+  province?: string
+  postalCode?: string
+  country?: string
+  isActive: boolean
+  acceptedTerms: boolean
+  createdAt: Date
+  updatedAt: Date
+  lastLoginAt?: Date
+  totalSpent: number
+  orders: string[]
+  segment?: 'new' | 'regular' | 'premium' | 'vip'
+  defaultAddress?: Address
+  lastOrderAt?: Date
 }
 
 export interface Address {
