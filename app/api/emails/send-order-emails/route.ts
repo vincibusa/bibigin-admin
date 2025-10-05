@@ -6,7 +6,19 @@ import {
   OrderConfirmationData,
   AdminNotificationData
 } from '@/lib/email'
-import { getAdminDb } from '@/lib/firebase-admin'
+import { getOrder } from '@/lib/orders'
+
+// Add CORS headers
+function addCorsHeaders(response: NextResponse) {
+  response.headers.set('Access-Control-Allow-Origin', '*')
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  return response
+}
+
+export async function OPTIONS() {
+  return addCorsHeaders(new NextResponse(null, { status: 200 }))
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,48 +26,27 @@ export async function POST(request: NextRequest) {
     const { orderId, customer } = body
 
     if (!orderId || !customer?.firstName || !customer?.lastName || !customer?.email) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         {
           success: false,
           error: 'Missing required fields: orderId, customer.firstName, customer.lastName, customer.email'
         },
         { status: 400 }
       )
+      return addCorsHeaders(response)
     }
 
-    // Get order details from database using Admin SDK
-    const db = getAdminDb()
-    const orderDoc = await db.collection('orders').doc(orderId).get()
-
-    if (!orderDoc.exists) {
-      return NextResponse.json(
-        { success: false, error: 'Order not found' },
+    // Fetch the order from the database
+    const order = await getOrder(orderId)
+    if (!order) {
+      const response = NextResponse.json(
+        {
+          success: false,
+          error: 'Order not found'
+        },
         { status: 404 }
       )
-    }
-
-    const orderData = orderDoc.data()
-    const order = {
-      id: orderDoc.id,
-      customerId: orderData?.customerId || '',
-      customerEmail: orderData?.customerEmail || '',
-      items: orderData?.items || [],
-      subtotal: orderData?.subtotal || 0,
-      shippingCost: orderData?.shippingCost || 0,
-      total: orderData?.total || 0,
-      status: orderData?.status || 'pending',
-      paymentStatus: orderData?.paymentStatus || 'pending',
-      shippingAddress: orderData?.shippingAddress || {},
-      billingAddress: orderData?.billingAddress || {},
-      createdAt: orderData?.createdAt?.toDate() || new Date(),
-      updatedAt: orderData?.updatedAt?.toDate() || new Date(),
-      // Ensure shipping field exists for backward compatibility
-      shipping: orderData?.shipping || {
-        street: orderData?.shippingAddress?.street,
-        city: orderData?.shippingAddress?.city,
-        postalCode: orderData?.shippingAddress?.postalCode,
-        country: orderData?.shippingAddress?.country
-      }
+      return addCorsHeaders(response)
     }
 
     // Prepare customer confirmation email data
@@ -64,13 +55,13 @@ export async function POST(request: NextRequest) {
       customer: {
         firstName: customer.firstName,
         lastName: customer.lastName,
-        email: order.customerEmail // Use email from order
+        email: customer.email // Use email from customer data
       },
       bankDetails: {
         iban: defaultBankDetails.iban,
         bankName: defaultBankDetails.bankName,
         beneficiary: defaultBankDetails.beneficiary,
-        reference: defaultBankDetails.reference(orderId, `${customer.firstName} ${customer.lastName}`)
+        reference: defaultBankDetails.reference(order.id, `${customer.firstName} ${customer.lastName}`)
       }
     }
 
@@ -80,7 +71,7 @@ export async function POST(request: NextRequest) {
       customer: {
         firstName: customer.firstName,
         lastName: customer.lastName,
-        email: order.customerEmail, // Use email from order
+        email: customer.email, // Use email from customer data
         phone: customer.phone
       },
       dashboardUrl: `${process.env.ADMIN_URL || 'http://localhost:3002'}/orders`
@@ -113,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     // If both emails failed, return error status
     if (customerEmailResult.status === 'rejected' && adminEmailResult.status === 'rejected') {
-      return NextResponse.json(
+      const errorResponse = NextResponse.json(
         { 
           ...response,
           success: false,
@@ -121,20 +112,23 @@ export async function POST(request: NextRequest) {
         },
         { status: 500 }
       )
+      return addCorsHeaders(errorResponse)
     }
 
     // If at least one email succeeded, return success with details
-    return NextResponse.json(response)
+    const successResponse = NextResponse.json(response)
+    return addCorsHeaders(successResponse)
 
   } catch (error) {
     console.error('Error sending order emails:', error)
     
-    return NextResponse.json(
+    const response = NextResponse.json(
       { 
         success: false, 
         error: error instanceof Error ? error.message : 'Failed to send order emails' 
       },
       { status: 500 }
     )
+    return addCorsHeaders(response)
   }
 }

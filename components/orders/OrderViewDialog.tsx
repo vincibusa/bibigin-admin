@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -148,9 +149,11 @@ export function OrderViewDialog({ open, onOpenChange, order }: OrderViewDialogPr
               <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-md">
                 <div className="flex items-center gap-3">
                   {item.image && (
-                    <img
+                    <Image
                       src={item.image}
                       alt={item.name || item.productName}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 object-cover rounded"
                       loading="lazy"
                       onError={(e) => {
