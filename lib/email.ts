@@ -39,21 +39,17 @@ export interface AdminNotificationData {
   dashboardUrl: string
 }
 
-// Get email configuration from environment variables
+// Get email configuration
 function getEmailConfig(): EmailConfig {
-  const host = process.env.EMAIL_HOST || 'smtp.gmail.com'
-  const port = parseInt(process.env.EMAIL_PORT || '587')
-  const user = process.env.EMAIL_USER
-  const pass = process.env.EMAIL_PASS
-
-  if (!user || !pass) {
-    throw new Error('Email configuration missing: EMAIL_USER and EMAIL_PASS are required')
-  }
+  const host = 'smtp.gmail.com'
+  const port = 587
+  const user = 'bibiginlacorte@gmail.com'
+  const pass = 'spvt nbjn moyj thjv'
 
   return {
     host,
     port,
-    secure: port === 465, // true for 465, false for other ports
+    secure: false, // false for port 587, true for port 465
     auth: {
       user,
       pass
@@ -85,8 +81,8 @@ export async function sendOrderConfirmationEmail(data: OrderConfirmationData): P
   try {
     const transporter = createTransporter()
     
-    const fromEmail = process.env.FROM_EMAIL || process.env.EMAIL_USER
-    const fromName = process.env.FROM_NAME || 'BibiGin - Gin delle Fasi Lunari'
+    const fromEmail = 'bibiginlacorte@gmail.com'
+    const fromName = 'BibiGin - Gin delle Fasi Lunari'
     
     const orderNumber = formatOrderNumber(data.order.id)
     
@@ -111,13 +107,9 @@ export async function sendAdminNotificationEmail(data: AdminNotificationData): P
   try {
     const transporter = createTransporter()
     
-    const fromEmail = process.env.FROM_EMAIL || process.env.EMAIL_USER
-    const fromName = process.env.FROM_NAME || 'BibiGin - Sistema Ordini'
-    const adminEmail = process.env.ADMIN_EMAIL
-    
-    if (!adminEmail) {
-      throw new Error('ADMIN_EMAIL environment variable is required')
-    }
+    const fromEmail = 'bibiginlacorte@gmail.com'
+    const fromName = 'BibiGin - Sistema Ordini'
+    const adminEmail = 'admin@bibiginlacorte.com'
     
     const orderNumber = formatOrderNumber(data.order.id)
     
@@ -140,7 +132,7 @@ export async function sendAdminNotificationEmail(data: AdminNotificationData): P
 // Generate HTML template for customer confirmation email  
 function generateCustomerEmailTemplate(data: OrderConfirmationData): string {
   const orderNumber = formatOrderNumber(data.order.id)
-  const orderDate = data.order.createdAt.toLocaleDateString('it-IT', {
+  const orderDate = new Date(data.order.createdAt).toLocaleDateString('it-IT', {
     day: '2-digit',
     month: '2-digit', 
     year: 'numeric'
@@ -150,10 +142,10 @@ function generateCustomerEmailTemplate(data: OrderConfirmationData): string {
   const shipping = {
     firstName: data.customer.firstName,
     lastName: data.customer.lastName,
-    street: data.order.shippingAddress.street,
-    city: data.order.shippingAddress.city,
-    postalCode: data.order.shippingAddress.postalCode,
-    country: data.order.shippingAddress.country
+    street: data.order.shipping?.street || data.order.shippingAddress?.street || 'N/A',
+    city: data.order.shipping?.city || data.order.shippingAddress?.city || 'N/A',
+    postalCode: data.order.shipping?.postalCode || data.order.shippingAddress?.postalCode || 'N/A',
+    country: data.order.shipping?.country || data.order.shippingAddress?.country || 'N/A'
   }
   
   return `
@@ -212,10 +204,10 @@ function generateCustomerEmailTemplate(data: OrderConfirmationData): string {
             <tbody>
               ${data.order.items.map(item => `
                 <tr>
-                  <td>${item.productName}</td>
+                  <td>${item.name || item.productName || 'Prodotto'}</td>
                   <td>${item.quantity}</td>
                   <td>${formatCurrency(item.price)}</td>
-                  <td>${formatCurrency(item.total)}</td>
+                  <td>${formatCurrency(item.price * item.quantity)}</td>
                 </tr>
               `).join('')}
               <tr>
@@ -224,7 +216,7 @@ function generateCustomerEmailTemplate(data: OrderConfirmationData): string {
               </tr>
               <tr>
                 <td colspan="3" style="text-align: right;"><strong>Spedizione:</strong></td>
-                <td>${formatCurrency(data.order.shippingCost || 0)}</td>
+                <td>${formatCurrency(data.order.shipping_cost || data.order.shippingCost || 0)}</td>
               </tr>
               <tr class="total-row">
                 <td colspan="3" style="text-align: right;"><strong>TOTALE:</strong></td>
@@ -278,7 +270,7 @@ function generateCustomerEmailTemplate(data: OrderConfirmationData): string {
 // Generate plain text version for customer email
 function generateCustomerEmailText(data: OrderConfirmationData): string {
   const orderNumber = formatOrderNumber(data.order.id)
-  const orderDate = data.order.createdAt.toLocaleDateString('it-IT')
+  const orderDate = new Date(data.order.createdAt).toLocaleDateString('it-IT')
   
   return `
 BIBIGIN - CONFERMA ORDINE ${orderNumber}
@@ -294,11 +286,11 @@ DETTAGLI ORDINE:
 
 PRODOTTI ORDINATI:
 ${data.order.items.map(item =>
-  `- ${item.productName} x${item.quantity} = ${formatCurrency(item.total)}`
+  `- ${item.name || item.productName || 'Prodotto'} x${item.quantity} = ${formatCurrency(item.price * item.quantity)}`
 ).join('\n')}
 
 Subtotale: ${formatCurrency(data.order.subtotal || data.order.total)}
-Spedizione: ${formatCurrency(data.order.shippingCost || 0)}
+Spedizione: ${formatCurrency(data.order.shipping_cost || data.order.shippingCost || 0)}
 TOTALE: ${formatCurrency(data.order.total)}
 
 DATI BONIFICO:
@@ -319,7 +311,7 @@ info@bibiginlacorte.com
 // Generate HTML template for admin notification email
 function generateAdminEmailTemplate(data: AdminNotificationData): string {
   const orderNumber = formatOrderNumber(data.order.id)
-  const orderDate = data.order.createdAt.toLocaleDateString('it-IT', {
+  const orderDate = new Date(data.order.createdAt).toLocaleDateString('it-IT', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -329,10 +321,10 @@ function generateAdminEmailTemplate(data: AdminNotificationData): string {
   
   // Extract shipping address
   const shipping = {
-    street: data.order.shippingAddress.street,
-    city: data.order.shippingAddress.city,
-    postalCode: data.order.shippingAddress.postalCode,
-    country: data.order.shippingAddress.country
+    street: data.order.shipping?.street || data.order.shippingAddress?.street || 'N/A',
+    city: data.order.shipping?.city || data.order.shippingAddress?.city || 'N/A',
+    postalCode: data.order.shipping?.postalCode || data.order.shippingAddress?.postalCode || 'N/A',
+    country: data.order.shipping?.country || data.order.shippingAddress?.country || 'N/A'
   }
   
   return `
@@ -397,10 +389,10 @@ function generateAdminEmailTemplate(data: AdminNotificationData): string {
             <tbody>
               ${data.order.items.map(item => `
                 <tr>
-                  <td>${item.productName}</td>
+                  <td>${item.name || item.productName || 'Prodotto'}</td>
                   <td>${item.quantity}</td>
                   <td>${formatCurrency(item.price)}</td>
-                  <td>${formatCurrency(item.total)}</td>
+                  <td>${formatCurrency(item.price * item.quantity)}</td>
                 </tr>
               `).join('')}
               <tr>
@@ -409,7 +401,7 @@ function generateAdminEmailTemplate(data: AdminNotificationData): string {
               </tr>
               <tr>
                 <td colspan="3" style="text-align: right;"><strong>Spedizione:</strong></td>
-                <td>${formatCurrency(data.order.shippingCost || 0)}</td>
+                <td>${formatCurrency(data.order.shipping_cost || data.order.shippingCost || 0)}</td>
               </tr>
               <tr class="total-row">
                 <td colspan="3" style="text-align: right;"><strong>TOTALE ORDINE:</strong></td>
@@ -446,7 +438,7 @@ function generateAdminEmailTemplate(data: AdminNotificationData): string {
 // Generate plain text version for admin email
 function generateAdminEmailText(data: AdminNotificationData): string {
   const orderNumber = formatOrderNumber(data.order.id)
-  const orderDate = data.order.createdAt.toLocaleDateString('it-IT')
+  const orderDate = new Date(data.order.createdAt).toLocaleDateString('it-IT')
   
   return `
 NUOVO ORDINE BIBIGIN - ${orderNumber}
@@ -460,11 +452,11 @@ ${data.customer.phone ? `Telefono: ${data.customer.phone}` : ''}
 
 PRODOTTI:
 ${data.order.items.map(item =>
-  `- ${item.productName} x${item.quantity} = ${formatCurrency(item.total)}`
+  `- ${item.name || item.productName || 'Prodotto'} x${item.quantity} = ${formatCurrency(item.price * item.quantity)}`
 ).join('\n')}
 
 Subtotale: ${formatCurrency(data.order.subtotal || data.order.total)}
-Spedizione: ${formatCurrency(data.order.shippingCost || 0)}
+Spedizione: ${formatCurrency(data.order.shipping_cost || data.order.shippingCost || 0)}
 TOTALE: ${formatCurrency(data.order.total)}
 
 PAGAMENTO: Bonifico Bancario

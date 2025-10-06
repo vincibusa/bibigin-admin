@@ -6,7 +6,6 @@ import {
   OrderConfirmationData,
   AdminNotificationData
 } from '@/lib/email'
-import { getOrder } from '@/lib/orders'
 
 // Add CORS headers
 function addCorsHeaders(response: NextResponse) {
@@ -23,28 +22,15 @@ export async function OPTIONS() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { orderId, customer } = body
+    const { order, customer } = body
 
-    if (!orderId || !customer?.firstName || !customer?.lastName || !customer?.email) {
+    if (!order || !customer?.firstName || !customer?.lastName || !customer?.email) {
       const response = NextResponse.json(
         {
           success: false,
-          error: 'Missing required fields: orderId, customer.firstName, customer.lastName, customer.email'
+          error: 'Missing required fields: order, customer.firstName, customer.lastName, customer.email'
         },
         { status: 400 }
-      )
-      return addCorsHeaders(response)
-    }
-
-    // Fetch the order from the database
-    const order = await getOrder(orderId)
-    if (!order) {
-      const response = NextResponse.json(
-        {
-          success: false,
-          error: 'Order not found'
-        },
-        { status: 404 }
       )
       return addCorsHeaders(response)
     }
