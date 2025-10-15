@@ -90,11 +90,11 @@ export function DeleteCustomerDialog({
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Totale speso:</span>
-              <span>€{customer.totalSpent.toFixed(2)}</span>
+              <span>€{(customer.totalSpent ?? 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Ordini:</span>
-              <span>{customer.orders.length}</span>
+              <span>{customer.orders?.length ?? 0}</span>
             </div>
           </div>
         </div>
@@ -261,11 +261,11 @@ export function CustomerDetailsDialog({
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Totale speso:</span>
-                  <span className="font-medium">€{customer.totalSpent.toFixed(2)}</span>
+                  <span className="font-medium">€{(customer.totalSpent ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Numero ordini:</span>
-                  <span>{customer.orders.length}</span>
+                  <span>{customer.orders?.length ?? 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Cliente dal:</span>

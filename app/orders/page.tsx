@@ -236,65 +236,67 @@ export default function OrdersPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-start">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
           <div>
-            <h1 className="font-playfair text-3xl font-bold text-foreground">
+            <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-foreground">
               Gestione Ordini
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm sm:text-base mt-1">
               Gestisci gli ordini del negozio BibiGin
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {selectedOrders.length > 0 && (
               <>
                 <Button
                   variant="outline"
                   onClick={handleBulkUpdateStatus}
+                  className="h-10 sm:h-9 text-sm"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  Aggiorna Stato ({selectedOrders.length})
+                  <span>Aggiorna ({selectedOrders.length})</span>
                 </Button>
                 <Button
                   variant="destructive"
                   onClick={() => setShowBulkDeleteDialog(true)}
+                  className="h-10 sm:h-9 text-sm"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Elimina Selezionati ({selectedOrders.length})
+                  <span>Elimina ({selectedOrders.length})</span>
                 </Button>
               </>
             )}
             <Button 
-              className="bg-navy hover:bg-navy/90 text-cream"
+              className="bg-navy hover:bg-navy/90 text-cream h-10 sm:h-9 text-sm"
               onClick={handleCreateQuickOrder}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Nuovo Ordine
+              <span>Nuovo Ordine</span>
             </Button>
           </div>
         </div>
 
         {/* Filtri */}
         <Card className="border-border bg-card">
-          <CardHeader>
-            <CardTitle className="text-card-foreground">Filtri</CardTitle>
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-card-foreground text-base sm:text-lg">Filtri</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex gap-4">
-              <div className="flex-1 max-w-sm">
+          <CardContent className="pt-0">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="flex-1 sm:max-w-sm">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="Cerca ordini..."
-                    className="pl-10 bg-background border-border"
+                    className="pl-10 bg-background border-border h-10 sm:h-9 text-base"
                     value={searchTerm}
                     onChange={(e) => handleSearch(e.target.value)}
                   />
                 </div>
               </div>
               <Select value={filters.status} onValueChange={handleStatusFilter}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-full sm:w-44 h-10 sm:h-9 text-base">
                   <SelectValue placeholder="Stato Ordine" />
                 </SelectTrigger>
                 <SelectContent>
@@ -307,7 +309,7 @@ export default function OrdersPage() {
                 </SelectContent>
               </Select>
               <Select value={filters.paymentStatus} onValueChange={handlePaymentStatusFilter}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-full sm:w-44 h-10 sm:h-9 text-base">
                   <SelectValue placeholder="Stato Pagamento" />
                 </SelectTrigger>
                 <SelectContent>
@@ -342,112 +344,183 @@ export default function OrdersPage() {
           </Card>
         )}
 
-        {/* Tabella Ordini */}
+        {/* Tabella Ordini - Responsive */}
         {!loading && !error && (
           <Card className="border-border bg-card">
-            <CardHeader>
+            <CardHeader className="pb-3 sm:pb-6">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-card-foreground">
+                <CardTitle className="text-card-foreground text-base sm:text-xl">
                   Ordini ({orders.length})
                 </CardTitle>
                 {orders.length > 0 && (
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-xs sm:text-sm text-muted-foreground">
                     {selectedOrders.length > 0 && (
-                      <span>{selectedOrders.length} selezionati</span>
+                      <span>{selectedOrders.length} sel.</span>
                     )}
                   </div>
                 )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {orders.length === 0 ? (
-                <div className="text-center py-8">
+                <div className="text-center py-12 sm:py-8">
                   <div className="text-muted-foreground">
-                    <h3 className="font-semibold mb-2">Nessun ordine trovato</h3>
-                    <p>Crea il primo ordine per il negozio BibiGin</p>
+                    <h3 className="font-semibold mb-2 text-base sm:text-lg">Nessun ordine trovato</h3>
+                    <p className="text-sm sm:text-base">Crea il primo ordine per il negozio BibiGin</p>
                   </div>
                   <Button 
-                    className="mt-4 bg-navy hover:bg-navy/90 text-cream"
+                    className="mt-6 sm:mt-4 bg-navy hover:bg-navy/90 text-cream h-11 sm:h-10"
                     onClick={handleCreateQuickOrder}
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Crea Primo Ordine
+                    <span>Crea Primo Ordine</span>
                   </Button>
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-border">
-                      <TableHead className="w-12">
-                        <Checkbox
-                          checked={selectedOrders.length === orders.length}
-                          onCheckedChange={handleSelectAll}
-                        />
-                      </TableHead>
-                      <TableHead className="text-card-foreground">Ordine</TableHead>
-                      <TableHead className="text-card-foreground">Cliente</TableHead>
-                      <TableHead className="text-card-foreground">Prodotti</TableHead>
-                      <TableHead className="text-card-foreground">Totale</TableHead>
-                      <TableHead className="text-card-foreground">Stato</TableHead>
-                      <TableHead className="text-card-foreground">Pagamento</TableHead>
-                      <TableHead className="text-card-foreground">Data</TableHead>
-                      <TableHead className="text-card-foreground w-20">Azioni</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                <>
+                  {/* Desktop Table */}
+                  <div className="hidden lg:block">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-border">
+                          <TableHead className="w-12">
+                            <Checkbox
+                              checked={selectedOrders.length === orders.length}
+                              onCheckedChange={handleSelectAll}
+                            />
+                          </TableHead>
+                          <TableHead className="text-card-foreground">Ordine</TableHead>
+                          <TableHead className="text-card-foreground">Cliente</TableHead>
+                          <TableHead className="text-card-foreground">Prodotti</TableHead>
+                          <TableHead className="text-card-foreground">Totale</TableHead>
+                          <TableHead className="text-card-foreground">Stato</TableHead>
+                          <TableHead className="text-card-foreground">Pagamento</TableHead>
+                          <TableHead className="text-card-foreground">Data</TableHead>
+                          <TableHead className="text-card-foreground w-20">Azioni</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {orders.map((order) => (
+                          <TableRow key={order.id} className="border-border">
+                            <TableCell>
+                              <Checkbox
+                                checked={selectedOrders.includes(order.id)}
+                                onCheckedChange={() => selectOrder(order.id)}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-medium text-card-foreground">
+                                #{order.id.slice(-8)}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-card-foreground">
+                                {order.customerEmail}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-card-foreground">
+                                {order.items.length} articoli
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-card-foreground font-medium">
+                              €{order.total.toFixed(2)}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={getStatusBadgeVariant(order.status)}>
+                                {order.status === 'pending' ? 'In Attesa' :
+                                 order.status === 'processing' ? 'In Elaborazione' :
+                                 order.status === 'shipped' ? 'Spedito' :
+                                 order.status === 'delivered' ? 'Consegnato' : 'Annullato'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={getPaymentStatusBadgeVariant(order.paymentStatus)}>
+                                {order.paymentStatus === 'pending' ? 'In Attesa' :
+                                 order.paymentStatus === 'paid' ? 'Pagato' :
+                                 order.paymentStatus === 'failed' ? 'Fallito' : 'Rimborsato'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-card-foreground">
+                              {order.createdAt.toLocaleDateString('it-IT')}
+                            </TableCell>
+                            <TableCell>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    className="h-8 w-8 p-0 hover:bg-accent/10"
+                                  >
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => handleViewOrder(order)}>
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    Visualizza
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleUpdateStatus(order)}>
+                                    <RefreshCw className="h-4 w-4 mr-2" />
+                                    Aggiorna Stato
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => handleDeleteOrder(order)}
+                                    className="text-destructive focus:text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Elimina
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Mobile Cards */}
+                  <div className="lg:hidden space-y-3">
                     {orders.map((order) => (
-                      <TableRow key={order.id} className="border-border">
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedOrders.includes(order.id)}
-                            onCheckedChange={() => selectOrder(order.id)}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <div className="font-medium text-card-foreground">
-                            #{order.id.slice(-8)}
+                      <div key={order.id} className="p-4 border border-border rounded-lg bg-card hover:shadow-sm transition-shadow">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-start space-x-3 flex-1">
+                            <Checkbox
+                              checked={selectedOrders.includes(order.id)}
+                              onCheckedChange={() => selectOrder(order.id)}
+                              className="mt-1.5 h-5 w-5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-card-foreground text-base mb-1">
+                                Ordine #{order.id.slice(-8)}
+                              </div>
+                              <div className="text-sm text-muted-foreground mb-2 truncate">
+                                {order.customerEmail}
+                              </div>
+                              <div className="flex gap-2 flex-wrap">
+                                <Badge variant={getStatusBadgeVariant(order.status)} className="text-xs h-5">
+                                  {order.status === 'pending' ? 'In Attesa' :
+                                   order.status === 'processing' ? 'In Elaborazione' :
+                                   order.status === 'shipped' ? 'Spedito' :
+                                   order.status === 'delivered' ? 'Consegnato' : 'Annullato'}
+                                </Badge>
+                                <Badge variant={getPaymentStatusBadgeVariant(order.paymentStatus)} className="text-xs h-5">
+                                  {order.paymentStatus === 'pending' ? 'In Attesa' :
+                                   order.paymentStatus === 'paid' ? 'Pagato' :
+                                   order.paymentStatus === 'failed' ? 'Fallito' : 'Rimborsato'}
+                                </Badge>
+                              </div>
+                            </div>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-card-foreground">
-                            {order.customerEmail}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-card-foreground">
-                            {order.items.length} articoli
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-card-foreground font-medium">
-                          €{order.total.toFixed(2)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={getStatusBadgeVariant(order.status)}>
-                            {order.status === 'pending' ? 'In Attesa' :
-                             order.status === 'processing' ? 'In Elaborazione' :
-                             order.status === 'shipped' ? 'Spedito' :
-                             order.status === 'delivered' ? 'Consegnato' : 'Annullato'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={getPaymentStatusBadgeVariant(order.paymentStatus)}>
-                            {order.paymentStatus === 'pending' ? 'In Attesa' :
-                             order.paymentStatus === 'paid' ? 'Pagato' :
-                             order.paymentStatus === 'failed' ? 'Fallito' : 'Rimborsato'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-card-foreground">
-                          {order.createdAt.toLocaleDateString('it-IT')}
-                        </TableCell>
-                        <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button 
                                 variant="ghost" 
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-accent/10"
+                                className="h-9 w-9 p-0 hover:bg-accent/10 -mt-1"
                               >
-                                <MoreHorizontal className="h-4 w-4" />
+                                <MoreHorizontal className="h-5 w-5" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -468,11 +541,35 @@ export default function OrdersPage() {
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border">
+                          <div>
+                            <div className="text-xs text-muted-foreground mb-1">Articoli</div>
+                            <div className="font-semibold text-sm text-card-foreground">
+                              {order.items.length} prodotti
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-xs text-muted-foreground mb-1">Totale</div>
+                            <div className="font-bold text-sm text-card-foreground">
+                              €{order.total.toFixed(2)}
+                            </div>
+                          </div>
+                          <div className="col-span-2">
+                            <div className="text-xs text-muted-foreground mb-1">Data ordine</div>
+                            <div className="text-sm text-card-foreground">
+                              {order.createdAt.toLocaleDateString('it-IT', { 
+                                day: 'numeric', 
+                                month: 'long', 
+                                year: 'numeric' 
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                  </TableBody>
-                </Table>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -480,15 +577,15 @@ export default function OrdersPage() {
 
         {/* Stats Cards */}
         {stats && !loading && (
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-4">
             <Card className="border-border bg-card">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-accent/10 rounded-lg">
-                    <Package className="w-6 h-6 text-accent" />
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
+                  <div className="p-2 bg-accent/10 rounded-lg w-fit">
+                    <Package className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Ordini Totali</p>
+                  <div className="sm:ml-4">
+                    <p className="text-xs font-medium text-muted-foreground mb-0.5">Ordini Totali</p>
                     <p className="text-2xl font-bold text-card-foreground">{stats.total}</p>
                   </div>
                 </div>
@@ -496,13 +593,13 @@ export default function OrdersPage() {
             </Card>
             
             <Card className="border-border bg-card">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-green-100 rounded-lg">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
+                  <div className="p-2 bg-green-100 rounded-lg w-fit">
                     <span className="text-2xl">✅</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Consegnati</p>
+                  <div className="sm:ml-4">
+                    <p className="text-xs font-medium text-muted-foreground mb-0.5">Consegnati</p>
                     <p className="text-2xl font-bold text-card-foreground">{stats.delivered}</p>
                   </div>
                 </div>
@@ -510,13 +607,13 @@ export default function OrdersPage() {
             </Card>
             
             <Card className="border-border bg-card">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-blue-100 rounded-lg">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
+                  <div className="p-2 bg-blue-100 rounded-lg w-fit">
                     <span className="text-2xl">📦</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">In Elaborazione</p>
+                  <div className="sm:ml-4">
+                    <p className="text-xs font-medium text-muted-foreground mb-0.5">In Elaborazione</p>
                     <p className="text-2xl font-bold text-card-foreground">{stats.processing + stats.shipped}</p>
                   </div>
                 </div>
@@ -524,13 +621,13 @@ export default function OrdersPage() {
             </Card>
             
             <Card className="border-border bg-card">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-green-100 rounded-lg">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
+                  <div className="p-2 bg-green-100 rounded-lg w-fit">
                     <span className="text-2xl">💰</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Fatturato</p>
+                  <div className="sm:ml-4">
+                    <p className="text-xs font-medium text-muted-foreground mb-0.5">Fatturato</p>
                     <p className="text-2xl font-bold text-card-foreground">
                       €{stats.totalRevenue.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
                     </p>

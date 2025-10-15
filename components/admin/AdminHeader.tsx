@@ -15,9 +15,9 @@ import {
 
 export function AdminHeader() {
   return (
-    <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
-      {/* Search Bar */}
-      <div className="flex-1 max-w-sm">
+    <header className="h-14 sm:h-16 border-b border-border bg-card px-4 sm:px-6 flex items-center justify-between">
+      {/* Search Bar - Hidden on mobile, shown on tablet+ */}
+      <div className="flex-1 max-w-sm hidden sm:block">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -27,10 +27,17 @@ export function AdminHeader() {
         </div>
       </div>
 
+      {/* Mobile Search Button */}
+      <div className="sm:hidden">
+        <Button variant="ghost" size="icon" className="h-9 w-9 min-h-9 min-w-9">
+          <Search className="h-4 w-4" />
+        </Button>
+      </div>
+
       {/* Actions */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-2 sm:space-x-4">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative h-9 w-9 min-h-9 min-w-9">
           <Bell className="h-4 w-4" />
           <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full text-[10px] flex items-center justify-center text-white">
             3
@@ -40,10 +47,10 @@ export function AdminHeader() {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+            <Button variant="ghost" className="relative h-9 w-9 min-h-9 min-w-9 rounded-full">
               <Avatar className="h-9 w-9">
                 <AvatarImage src="/avatars/admin.png" alt="Admin" />
-                <AvatarFallback className="bg-navy text-cream">AD</AvatarFallback>
+                <AvatarFallback className="bg-navy text-cream text-xs">AD</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>

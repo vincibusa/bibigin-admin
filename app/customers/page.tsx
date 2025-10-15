@@ -161,7 +161,7 @@ export default function CustomersPage() {
 
   // Get segment badge variant
   const getSegmentBadgeVariant = (customer: Customer) => {
-    const segment = calculateCustomerSegment(customer.totalSpent, customer.orders.length)
+    const segment = calculateCustomerSegment(customer.totalSpent ?? 0, customer.orders?.length ?? 0)
     switch (segment) {
       case 'vip': return 'default'
       case 'regular': return 'secondary'
@@ -172,7 +172,7 @@ export default function CustomersPage() {
 
   // Get segment label
   const getSegmentLabel = (customer: Customer) => {
-    const segment = calculateCustomerSegment(customer.totalSpent, customer.orders.length)
+    const segment = calculateCustomerSegment(customer.totalSpent ?? 0, customer.orders?.length ?? 0)
     switch (segment) {
       case 'vip': return 'VIP'
       case 'regular': return 'Abituale'
@@ -183,47 +183,48 @@ export default function CustomersPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-start">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
           <div>
-            <h1 className="font-playfair text-3xl font-bold text-foreground">
+            <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-foreground">
               Gestione Clienti
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm sm:text-base mt-1">
               Gestisci i clienti del negozio BibiGin
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {selectedCustomers.length > 0 && (
               <Button
                 variant="destructive"
                 onClick={() => setShowBulkDeleteDialog(true)}
+                className="h-10 sm:h-9 text-sm"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                Elimina Selezionati ({selectedCustomers.length})
+                <span>Elimina ({selectedCustomers.length})</span>
               </Button>
             )}
             <Button 
-              className="bg-navy hover:bg-navy/90 text-cream"
+              className="bg-navy hover:bg-navy/90 text-cream h-10 sm:h-9 text-sm"
               onClick={handleCreateQuickCustomer}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Nuovo Cliente
+              <span>Nuovo Cliente</span>
             </Button>
           </div>
         </div>
 
         {/* Stats Cards */}
         {stats && !loading && (
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-4">
             <Card className="border-border bg-card">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-accent/10 rounded-lg">
-                    <Users className="w-6 h-6 text-accent" />
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
+                  <div className="p-2 bg-accent/10 rounded-lg w-fit">
+                    <Users className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Clienti Totali</p>
+                  <div className="sm:ml-4">
+                    <p className="text-xs font-medium text-muted-foreground mb-0.5">Clienti Totali</p>
                     <p className="text-2xl font-bold text-card-foreground">{stats.total}</p>
                   </div>
                 </div>
@@ -231,13 +232,13 @@ export default function CustomersPage() {
             </Card>
             
             <Card className="border-border bg-card">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-green-100 rounded-lg">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
+                  <div className="p-2 bg-green-100 rounded-lg w-fit">
                     <span className="text-2xl">📈</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Nuovi Questo Mese</p>
+                  <div className="sm:ml-4">
+                    <p className="text-xs font-medium text-muted-foreground mb-0.5">Nuovi Mese</p>
                     <p className="text-2xl font-bold text-card-foreground">{stats.newThisMonth}</p>
                   </div>
                 </div>
@@ -245,13 +246,13 @@ export default function CustomersPage() {
             </Card>
             
             <Card className="border-border bg-card">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-blue-100 rounded-lg">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
+                  <div className="p-2 bg-blue-100 rounded-lg w-fit">
                     <span className="text-2xl">🛒</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Con Ordini</p>
+                  <div className="sm:ml-4">
+                    <p className="text-xs font-medium text-muted-foreground mb-0.5">Con Ordini</p>
                     <p className="text-2xl font-bold text-card-foreground">{stats.withOrders}</p>
                   </div>
                 </div>
@@ -259,13 +260,13 @@ export default function CustomersPage() {
             </Card>
             
             <Card className="border-border bg-card">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-green-100 rounded-lg">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
+                  <div className="p-2 bg-green-100 rounded-lg w-fit">
                     <span className="text-2xl">💰</span>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-muted-foreground">Valore Medio</p>
+                  <div className="sm:ml-4">
+                    <p className="text-xs font-medium text-muted-foreground mb-0.5">Valore Medio</p>
                     <p className="text-2xl font-bold text-card-foreground">
                       €{stats.averageOrderValue.toFixed(0)}
                     </p>
@@ -278,24 +279,24 @@ export default function CustomersPage() {
 
         {/* Filtri */}
         <Card className="border-border bg-card">
-          <CardHeader>
-            <CardTitle className="text-card-foreground">Filtri</CardTitle>
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-card-foreground text-base sm:text-lg">Filtri</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex gap-4">
-              <div className="flex-1 max-w-sm">
+          <CardContent className="pt-0">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="flex-1 sm:max-w-sm">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="Cerca clienti..."
-                    className="pl-10 bg-background border-border"
+                    className="pl-10 bg-background border-border h-10 sm:h-9 text-base"
                     value={searchTerm}
                     onChange={(e) => handleSearch(e.target.value)}
                   />
                 </div>
               </div>
               <Select value={filters.hasOrders} onValueChange={handleOrdersFilter}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-full sm:w-44 h-10 sm:h-9 text-base">
                   <SelectValue placeholder="Ordini" />
                 </SelectTrigger>
                 <SelectContent>
@@ -331,37 +332,40 @@ export default function CustomersPage() {
         {/* Tabella Clienti */}
         {!loading && !error && (
           <Card className="border-border bg-card">
-            <CardHeader>
+            <CardHeader className="pb-3 sm:pb-6">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-card-foreground">
+                <CardTitle className="text-card-foreground text-base sm:text-xl">
                   Clienti ({customers.length})
                 </CardTitle>
                 {customers.length > 0 && (
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-xs sm:text-sm text-muted-foreground">
                     {selectedCustomers.length > 0 && (
-                      <span>{selectedCustomers.length} selezionati</span>
+                      <span>{selectedCustomers.length} sel.</span>
                     )}
                   </div>
                 )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {customers.length === 0 ? (
-                <div className="text-center py-8">
+                <div className="text-center py-12 sm:py-8">
                   <div className="text-muted-foreground">
-                    <h3 className="font-semibold mb-2">Nessun cliente trovato</h3>
-                    <p>Crea il primo cliente per il negozio BibiGin</p>
+                    <h3 className="font-semibold mb-2 text-base sm:text-lg">Nessun cliente trovato</h3>
+                    <p className="text-sm sm:text-base">Crea il primo cliente per il negozio BibiGin</p>
                   </div>
                   <Button 
-                    className="mt-4 bg-navy hover:bg-navy/90 text-cream"
+                    className="mt-6 sm:mt-4 bg-navy hover:bg-navy/90 text-cream h-11 sm:h-10"
                     onClick={handleCreateQuickCustomer}
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Crea Primo Cliente
+                    <span>Crea Primo Cliente</span>
                   </Button>
                 </div>
               ) : (
-                <Table>
+                <>
+                  {/* Desktop Table */}
+                  <div className="hidden lg:block">
+                    <Table>
                   <TableHeader>
                     <TableRow className="border-border">
                       <TableHead className="w-12">
@@ -410,10 +414,10 @@ export default function CustomersPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-card-foreground">
-                          {customer.orders.length}
+                          {customer.orders?.length ?? 0}
                         </TableCell>
                         <TableCell className="text-card-foreground font-medium">
-                          €{customer.totalSpent.toFixed(2)}
+                          €{(customer.totalSpent ?? 0).toFixed(2)}
                         </TableCell>
                         <TableCell>
                           <Badge variant={getSegmentBadgeVariant(customer)}>
@@ -453,6 +457,91 @@ export default function CustomersPage() {
                     ))}
                   </TableBody>
                 </Table>
+                  </div>
+
+                  {/* Mobile Cards */}
+                  <div className="lg:hidden space-y-3">
+                    {customers.map((customer) => (
+                      <div key={customer.id} className="p-4 border border-border rounded-lg bg-card hover:shadow-sm transition-shadow">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-start space-x-3 flex-1">
+                            <Checkbox
+                              checked={selectedCustomers.includes(customer.id)}
+                              onCheckedChange={() => selectCustomer(customer.id)}
+                              className="mt-1.5 h-5 w-5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-card-foreground text-base mb-1">
+                                {customer.firstName} {customer.lastName}
+                              </div>
+                              <div className="text-sm text-muted-foreground mb-2 truncate">
+                                <Mail className="w-3 h-3 inline mr-1" />
+                                {customer.email}
+                              </div>
+                              {customer.phone && (
+                                <div className="text-xs text-muted-foreground mb-2">
+                                  <Phone className="w-3 h-3 inline mr-1" />
+                                  {customer.phone}
+                                </div>
+                              )}
+                              <Badge variant={getSegmentBadgeVariant(customer)} className="text-xs h-5">
+                                {getSegmentLabel(customer)}
+                              </Badge>
+                            </div>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="h-9 w-9 p-0 hover:bg-accent/10 -mt-1"
+                              >
+                                <MoreHorizontal className="h-5 w-5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleViewCustomer(customer)}>
+                                <Eye className="h-4 w-4 mr-2" />
+                                Visualizza
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleDeleteCustomer(customer)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Elimina
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border">
+                          <div>
+                            <div className="text-xs text-muted-foreground mb-1">Ordini</div>
+                            <div className="font-semibold text-sm text-card-foreground">
+                              {customer.orders?.length ?? 0} ordini
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-xs text-muted-foreground mb-1">Totale Speso</div>
+                            <div className="font-bold text-sm text-card-foreground">
+                              €{(customer.totalSpent ?? 0).toFixed(2)}
+                            </div>
+                          </div>
+                          <div className="col-span-2">
+                            <div className="text-xs text-muted-foreground mb-1">Cliente dal</div>
+                            <div className="text-sm text-card-foreground">
+                              {customer.createdAt.toLocaleDateString('it-IT', { 
+                                day: 'numeric', 
+                                month: 'long', 
+                                year: 'numeric' 
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

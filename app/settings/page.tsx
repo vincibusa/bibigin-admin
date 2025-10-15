@@ -146,15 +146,15 @@ export default function SettingsPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
           <div>
-            <h1 className="font-playfair text-3xl font-bold text-foreground">
+            <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-foreground">
               Impostazioni
             </h1>
             <div className="flex items-center gap-2 mt-1">
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Gestisci le configurazioni del tuo negozio BibiGin
               </p>
               {loading && (
@@ -171,17 +171,17 @@ export default function SettingsPage() {
           {/* Status indicator */}
           <div className="flex items-center gap-2">
             {loading ? (
-              <Badge variant="secondary" className="gap-1">
+              <Badge variant="secondary" className="gap-1 text-xs">
                 <RefreshCw className="w-3 h-3 animate-spin" />
                 Caricamento...
               </Badge>
             ) : error ? (
-              <Badge variant="destructive" className="gap-1">
+              <Badge variant="destructive" className="gap-1 text-xs">
                 <AlertCircle className="w-3 h-3" />
                 Errore
               </Badge>
             ) : (
-              <Badge variant="default" className="bg-green-100 text-green-800 gap-1">
+              <Badge variant="default" className="bg-green-100 text-green-800 gap-1 text-xs">
                 <CheckCircle className="w-3 h-3" />
                 Sincronizzato
               </Badge>
@@ -189,19 +189,19 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           {/* Main Settings Column */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Store Settings */}
             <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-card-foreground flex items-center gap-2">
-                  <Store className="w-5 h-5" />
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-card-foreground flex items-center gap-2 text-base sm:text-lg">
+                  <Store className="w-4 h-4 sm:w-5 sm:h-5" />
                   Impostazioni Negozio
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <CardContent className="space-y-4 pt-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="storeName">Nome Negozio</Label>
                     <Input
@@ -291,7 +291,7 @@ export default function SettingsPage() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="storeCountry">Paese</Label>
                     <Input
@@ -300,6 +300,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleStoreSettingChange('country', e.target.value)}
                       placeholder="Italia"
                       disabled={loading}
+                      className="h-10 sm:h-9"
                     />
                     {validationErrors.store?.country && (
                       <p className="text-sm text-destructive">{validationErrors.store.country[0]}</p>
@@ -314,6 +315,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleStoreSettingChange('currency', e.target.value)}
                       placeholder="EUR"
                       disabled={loading}
+                      className="h-10 sm:h-9"
                     />
                     {validationErrors.store?.currency && (
                       <p className="text-sm text-destructive">{validationErrors.store.currency[0]}</p>
@@ -328,6 +330,7 @@ export default function SettingsPage() {
                       onChange={(e) => handleStoreSettingChange('timezone', e.target.value)}
                       placeholder="Europe/Rome"
                       disabled={loading}
+                      className="h-10 sm:h-9"
                     />
                     {validationErrors.store?.timezone && (
                       <p className="text-sm text-destructive">{validationErrors.store.timezone[0]}</p>
@@ -335,11 +338,11 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end pt-2">
                   <Button 
                     onClick={handleSaveStoreSettings}
                     disabled={saving || loading || !storeSettings}
-                    className="bg-navy hover:bg-navy/90 text-cream"
+                    className="bg-navy hover:bg-navy/90 text-cream w-full sm:w-auto h-11 sm:h-10"
                   >
                     {saving ? (
                       <>
@@ -359,13 +362,13 @@ export default function SettingsPage() {
 
             {/* Notification Settings */}
             <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-card-foreground flex items-center gap-2">
-                  <Bell className="w-5 h-5" />
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-card-foreground flex items-center gap-2 text-base sm:text-lg">
+                  <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
                   Notifiche
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 pt-0">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
@@ -446,11 +449,11 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end pt-2">
                   <Button 
                     onClick={handleSaveNotificationSettings}
                     disabled={saving || loading || !notificationSettings}
-                    className="bg-navy hover:bg-navy/90 text-cream"
+                    className="bg-navy hover:bg-navy/90 text-cream w-full sm:w-auto h-11 sm:h-10"
                   >
                     {saving ? (
                       <>
@@ -470,12 +473,12 @@ export default function SettingsPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* System Status */}
             <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-card-foreground flex items-center gap-2">
-                  <Database className="w-5 h-5" />
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-card-foreground flex items-center gap-2 text-base sm:text-lg">
+                  <Database className="w-4 h-4 sm:w-5 sm:h-5" />
                   Stato Sistema
                 </CardTitle>
               </CardHeader>
@@ -512,13 +515,13 @@ export default function SettingsPage() {
 
             {/* Quick Actions */}
             <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-card-foreground">Azioni Rapide</CardTitle>
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-card-foreground text-base sm:text-lg">Azioni Rapide</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-3 pt-0">
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start"
+                  className="w-full justify-start h-11 sm:h-10 text-sm"
                   onClick={handleExportData}
                   disabled={isExporting}
                 >
@@ -526,17 +529,17 @@ export default function SettingsPage() {
                   {isExporting ? 'Esportazione...' : 'Esporta Dati'}
                 </Button>
                 
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start h-11 sm:h-10 text-sm">
                   <Upload className="w-4 h-4 mr-2" />
                   Importa Dati
                 </Button>
                 
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start h-11 sm:h-10 text-sm">
                   <Mail className="w-4 h-4 mr-2" />
                   Test Email
                 </Button>
                 
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start h-11 sm:h-10 text-sm">
                   <Shield className="w-4 h-4 mr-2" />
                   Backup Manuale
                 </Button>
@@ -545,20 +548,20 @@ export default function SettingsPage() {
 
             {/* Admin Users */}
             <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-card-foreground flex items-center gap-2">
-                  <Users className="w-5 h-5" />
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-card-foreground flex items-center gap-2 text-base sm:text-lg">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                   Utenti Admin
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span>catanzaroepartners@gmail.com</span>
-                  <Badge variant="default">Owner</Badge>
+              <CardContent className="space-y-3 pt-0">
+                <div className="flex items-center justify-between text-xs sm:text-sm">
+                  <span className="truncate">catanzaroepartners@gmail.com</span>
+                  <Badge variant="default" className="text-xs ml-2">Owner</Badge>
                 </div>
                 
                 <div className="text-center">
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button variant="outline" className="w-full h-11 sm:h-10 text-sm">
                     <Users className="w-4 h-4 mr-2" />
                     Gestisci Utenti
                   </Button>
@@ -568,9 +571,9 @@ export default function SettingsPage() {
 
             {/* Security */}
             <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-card-foreground flex items-center gap-2">
-                  <Lock className="w-5 h-5" />
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-card-foreground flex items-center gap-2 text-base sm:text-lg">
+                  <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
                   Sicurezza
                 </CardTitle>
               </CardHeader>
@@ -594,7 +597,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 
-                <Button variant="outline" size="sm" className="w-full">
+                <Button variant="outline" className="w-full h-11 sm:h-10 text-sm">
                   <Shield className="w-4 h-4 mr-2" />
                   Configura 2FA
                 </Button>
@@ -605,28 +608,28 @@ export default function SettingsPage() {
 
         {/* Advanced Settings */}
         <Card className="border-border bg-card">
-          <CardHeader>
-            <CardTitle className="text-card-foreground flex items-center gap-2">
-              <SettingsIcon className="w-5 h-5" />
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-card-foreground flex items-center gap-2 text-base sm:text-lg">
+              <SettingsIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               Impostazioni Avanzate
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-6 md:grid-cols-2">
+          <CardContent className="pt-0">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
               <div className="space-y-4">
-                <h4 className="font-medium">Configurazione API</h4>
+                <h4 className="font-medium text-sm sm:text-base">Configurazione API</h4>
                 <div className="space-y-2">
-                  <Label>Firebase Project ID</Label>
-                  <Input value="bibiginlacorte" disabled />
+                  <Label className="text-xs sm:text-sm">Firebase Project ID</Label>
+                  <Input value="bibiginlacorte" disabled className="h-10 sm:h-9 text-sm" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Environment</Label>
-                  <Input value="production" disabled />
+                  <Label className="text-xs sm:text-sm">Environment</Label>
+                  <Input value="production" disabled className="h-10 sm:h-9 text-sm" />
                 </div>
               </div>
               
               <div className="space-y-4">
-                <h4 className="font-medium">Integrazioni</h4>
+                <h4 className="font-medium text-sm sm:text-base">Integrazioni</h4>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Stripe</span>

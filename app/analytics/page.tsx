@@ -38,15 +38,13 @@ export default function AnalyticsPage() {
   const [customDateRange, setCustomDateRange] = useState<AnalyticsDateRange | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  // Get predefined date ranges
-  const dateRanges = getDateRanges()
-
   // Get current date range based on selection
   const getCurrentDateRange = useCallback((): AnalyticsDateRange => {
     if (selectedRange === 'custom' && customDateRange) {
       return customDateRange
     }
-    // Only access valid preset ranges
+    // Get date ranges only when needed
+    const dateRanges = getDateRanges()
     const validRanges = {
       last7Days: dateRanges.last7Days,
       last30Days: dateRanges.last30Days,
@@ -54,7 +52,7 @@ export default function AnalyticsPage() {
       lastMonth: dateRanges.lastMonth
     }
     return validRanges[selectedRange as keyof typeof validRanges] || dateRanges.last30Days
-  }, [selectedRange, customDateRange, dateRanges])
+  }, [selectedRange, customDateRange])
 
   // Load analytics data
   const loadAnalytics = useCallback(async () => {
@@ -97,7 +95,8 @@ export default function AnalyticsPage() {
   // Load data on mount and when date range changes
   useEffect(() => {
     loadAnalytics()
-  }, [loadAnalytics])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRange, customDateRange])
 
   // Get range label for display
   const getRangeLabel = () => {
@@ -117,42 +116,43 @@ export default function AnalyticsPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
           <div>
-            <h1 className="font-playfair text-3xl font-bold text-foreground">
+            <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-foreground">
               Analytics BibiGin
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm sm:text-base mt-1">
               Dashboard analytics e insights del negozio
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button
               variant="outline"
               onClick={handleRefresh}
               disabled={isRefreshing}
+              className="h-10 sm:h-9 text-sm"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-              Aggiorna
+              <span className="hidden sm:inline">Aggiorna</span>
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" className="h-10 sm:h-9 text-sm">
               <Download className="w-4 h-4 mr-2" />
-              Esporta
+              <span className="hidden sm:inline">Esporta</span>
             </Button>
           </div>
         </div>
 
         {/* Date Range Selector */}
         <Card className="border-border bg-card">
-          <CardHeader>
-            <CardTitle className="text-card-foreground">Periodo di Analisi</CardTitle>
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-card-foreground text-base sm:text-lg">Periodo di Analisi</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-4 items-center">
+          <CardContent className="pt-0">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 sm:items-center">
               <Select value={selectedRange} onValueChange={handleDateRangeChange}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-full sm:w-56 h-10 sm:h-9 text-base">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -167,7 +167,7 @@ export default function AnalyticsPage() {
               {selectedRange === 'custom' && (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="justify-start text-left font-normal">
+                    <Button variant="outline" className="w-full sm:w-auto justify-start text-left font-normal h-10 sm:h-9 text-sm">
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {customDateRange ? (
                         `${format(customDateRange.from, 'dd MMM yyyy')} - ${format(customDateRange.to, 'dd MMM yyyy')}`
@@ -177,6 +177,20 @@ export default function AnalyticsPage() {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="range"
+                      numberOfMonths={1}
+                      selected={{
+                        from: customDateRange?.from,
+                        to: customDateRange?.to
+                      }}
+                      onSelect={(range) => {
+                        if (range?.from && range?.to) {
+                          handleCustomDateChange(range.from, range.to)
+                        }
+                      }}
+                      className="sm:hidden"
+                    />
                     <Calendar
                       mode="range"
                       numberOfMonths={2}
@@ -189,13 +203,15 @@ export default function AnalyticsPage() {
                           handleCustomDateChange(range.from, range.to)
                         }
                       }}
+                      className="hidden sm:block"
                     />
                   </PopoverContent>
                 </Popover>
               )}
 
-              <div className="text-sm text-muted-foreground">
-                Periodo selezionato: <span className="font-medium">{getRangeLabel()}</span>
+              <div className="text-xs sm:text-sm text-muted-foreground">
+                <span className="hidden sm:inline">Periodo selezionato: </span>
+                <span className="font-medium">{getRangeLabel()}</span>
               </div>
             </div>
           </CardContent>
@@ -234,7 +250,7 @@ export default function AnalyticsPage() {
         )}
 
         {/* Charts Section */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
           <RevenueChart 
             data={analyticsData?.revenueChart || []} 
             loading={loading}
@@ -247,7 +263,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Top Products and Recent Orders */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
           <TopProductsCard 
             products={analyticsData?.topProducts || []} 
             loading={loading}
@@ -255,13 +271,13 @@ export default function AnalyticsPage() {
           
           {/* Recent Orders Card */}
           <Card className="border-border bg-card">
-            <CardHeader>
-              <CardTitle className="text-card-foreground flex items-center gap-2">
-                <ShoppingCart className="w-5 h-5" />
+            <CardHeader className="pb-3 sm:pb-6">
+              <CardTitle className="text-card-foreground flex items-center gap-2 text-base sm:text-lg">
+                <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                 Ordini Recenti
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {loading ? (
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
@@ -324,16 +340,16 @@ export default function AnalyticsPage() {
         {/* Performance Summary */}
         {analyticsData && (
           <Card className="border-border bg-card">
-            <CardHeader>
-              <CardTitle className="text-card-foreground flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" />
+            <CardHeader className="pb-3 sm:pb-6">
+              <CardTitle className="text-card-foreground flex items-center gap-2 text-base sm:text-lg">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
                 Riepilogo Performance
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-3">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-card-foreground mb-2">
+            <CardContent className="pt-0">
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-3">
+                <div className="text-center p-4 bg-accent/5 rounded-lg">
+                  <div className="text-2xl sm:text-3xl font-bold text-card-foreground mb-2">
                     {formatCurrency(analyticsData.salesMetrics.totalRevenue)}
                   </div>
                   <div className="text-sm text-muted-foreground">
@@ -344,8 +360,8 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
                 
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-card-foreground mb-2">
+                <div className="text-center p-4 bg-accent/5 rounded-lg">
+                  <div className="text-2xl sm:text-3xl font-bold text-card-foreground mb-2">
                     {analyticsData.salesMetrics.totalOrders}
                   </div>
                   <div className="text-sm text-muted-foreground">
@@ -356,8 +372,8 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
                 
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-card-foreground mb-2">
+                <div className="text-center p-4 bg-accent/5 rounded-lg">
+                  <div className="text-2xl sm:text-3xl font-bold text-card-foreground mb-2">
                     {analyticsData.customerMetrics.newCustomers + analyticsData.customerMetrics.returningCustomers}
                   </div>
                   <div className="text-sm text-muted-foreground">

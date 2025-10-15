@@ -24,7 +24,10 @@ function convertFirestoreCustomer(id: string, data: Record<string, unknown>): Cu
   return {
     id,
     ...data,
+    totalSpent: (data.totalSpent as number) ?? 0,
+    orders: (data.orders as string[]) ?? [],
     createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(),
+    updatedAt: (data.updatedAt as Timestamp)?.toDate() || new Date(),
     lastOrderAt: (data.lastOrderAt as Timestamp)?.toDate() || undefined
   } as Customer
 }

@@ -60,21 +60,21 @@ const items = [
 
 export function AdminSidebar() {
   return (
-    <Sidebar className="border-r border-sidebar-border bg-sidebar">
-      <SidebarHeader className="px-6 py-4 border-b border-sidebar-border">
+    <Sidebar className="border-r border-sidebar-border bg-white">
+      <SidebarHeader className="px-4 sm:px-6 py-4 border-b border-sidebar-border bg-white">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 rounded-full bg-navy flex items-center justify-center">
-            <span className="text-cream font-playfair font-bold text-lg">B</span>
+          <div className="w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-navy flex items-center justify-center">
+            <span className="text-cream font-playfair font-bold text-xl sm:text-lg">B</span>
           </div>
           <div>
-            <h2 className="font-playfair text-lg font-bold text-sidebar-foreground">BibiGin</h2>
-            <p className="text-xs text-sidebar-foreground/60">Gestionale Admin</p>
+            <h2 className="font-playfair text-xl sm:text-lg font-bold text-navy">BibiGin</h2>
+            <p className="text-xs text-muted-foreground">Gestionale Admin</p>
           </div>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-white">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/80 font-medium">
+          <SidebarGroupLabel className="text-muted-foreground font-medium px-4 sm:px-2">
             Gestionale
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -83,10 +83,10 @@ export function AdminSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
                     asChild
-                    className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+                    className="hover:bg-accent/10 hover:text-navy transition-colors mx-2 sm:mx-0 h-12 sm:h-8 text-base sm:text-sm"
                   >
-                    <a href={item.url} className="flex items-center">
-                      <item.icon className="w-4 h-4" />
+                    <a href={item.url} className="flex items-center gap-3 sm:gap-2">
+                      <item.icon className="w-5 h-5 sm:w-4 sm:h-4" />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
@@ -96,11 +96,11 @@ export function AdminSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="p-4 border-t border-sidebar-border">
+      <SidebarFooter className="p-4 border-t border-sidebar-border bg-white">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="w-full hover:bg-destructive/10 hover:text-destructive transition-colors">
-              <LogOut className="w-4 h-4" />
+            <SidebarMenuButton className="w-full hover:bg-destructive/10 hover:text-destructive transition-colors h-12 sm:h-8 text-base sm:text-sm mx-0">
+              <LogOut className="w-5 h-5 sm:w-4 sm:h-4" />
               <span>Logout</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

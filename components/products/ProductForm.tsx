@@ -160,12 +160,12 @@ export function ProductForm({ open, onOpenChange, onSubmit, product, mode }: Pro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="font-playfair text-xl">
+          <DialogTitle className="font-playfair text-lg sm:text-xl">
             {mode === 'create' ? 'Nuovo Prodotto' : 'Modifica Prodotto'}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm sm:text-base">
             {mode === 'create' 
               ? 'Aggiungi un nuovo prodotto al catalogo BibiGin'
               : 'Modifica le informazioni del prodotto'
@@ -176,10 +176,10 @@ export function ProductForm({ open, onOpenChange, onSubmit, product, mode }: Pro
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="basic">Base</TabsTrigger>
-                <TabsTrigger value="media">Media</TabsTrigger>
-                <TabsTrigger value="details">Dettagli</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 text-xs sm:text-sm">
+                <TabsTrigger value="basic" className="text-xs sm:text-sm">Base</TabsTrigger>
+                <TabsTrigger value="media" className="text-xs sm:text-sm">Media</TabsTrigger>
+                <TabsTrigger value="details" className="text-xs sm:text-sm">Dettagli</TabsTrigger>
               </TabsList>
 
               {/* Basic Information */}
@@ -189,7 +189,7 @@ export function ProductForm({ open, onOpenChange, onSubmit, product, mode }: Pro
                     <CardTitle>Informazioni Base</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
                         name="name"
@@ -237,7 +237,7 @@ export function ProductForm({ open, onOpenChange, onSubmit, product, mode }: Pro
                       )}
                     />
 
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <FormField
                         control={form.control}
                         name="price"
@@ -303,7 +303,7 @@ export function ProductForm({ open, onOpenChange, onSubmit, product, mode }: Pro
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
                         name="status"
@@ -471,7 +471,7 @@ export function ProductForm({ open, onOpenChange, onSubmit, product, mode }: Pro
                     <CardTitle>Dettagli Tecnici</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <FormField
                         control={form.control}
                         name="weight"
@@ -537,22 +537,25 @@ export function ProductForm({ open, onOpenChange, onSubmit, product, mode }: Pro
               </TabsContent>
             </Tabs>
 
-            <div className="flex justify-end gap-2 pt-4 border-t">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4 border-t">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
+                className="h-10 sm:h-9"
               >
                 Annulla
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-navy hover:bg-navy/90 text-cream"
+                className="bg-navy hover:bg-navy/90 text-cream h-10 sm:h-9"
               >
                 {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {mode === 'create' ? 'Crea Prodotto' : 'Salva Modifiche'}
+                <span className="text-sm sm:text-base">
+                  {mode === 'create' ? 'Crea Prodotto' : 'Salva Modifiche'}
+                </span>
               </Button>
             </div>
           </form>
